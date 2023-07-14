@@ -16,7 +16,10 @@ public class YesssirboxCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (sender instanceof Player) if (!sender.hasPermission("yesssirbox.admin")) sender.sendMessage(ChatColor.RED+"You don't have permission to execute this command!");
+        if (sender instanceof Player) if (!sender.hasPermission("yesssirbox.admin")) {
+            sender.sendMessage(ChatColor.RED+"You don't have permission to execute this command!");
+            return true;
+        }
         if (args.length == 0) {
             sender.sendMessage(ChatColor.GREEN+"/yesssirbox <reload/addBlock> [value]");
         }
