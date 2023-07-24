@@ -23,7 +23,7 @@ public class BountyCommand implements CommandExecutor {
         if (args.length == 0) {
             List<String> playerBounties = Yesssirbox.getPlugin(Yesssirbox.class).getConfig().getStringList("bounties");
             if (playerBounties.isEmpty()) {
-                player.sendMessage(ChatColor.GREEN+"There are no bounties open at the moment! Check back later.");
+                player.sendMessage(ChatColor.GREEN+"There are no bounties open at the moment! Check back later, or create your own with "+ChatColor.BOLD +"/bounty <player> <amount> "+ChatColor.GREEN+"!");
             }
             else {
                 for (String bounty : playerBounties) {
