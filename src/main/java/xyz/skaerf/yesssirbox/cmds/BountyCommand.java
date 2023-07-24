@@ -1,6 +1,5 @@
 package xyz.skaerf.yesssirbox.cmds;
 
-import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -28,9 +27,11 @@ public class BountyCommand implements CommandExecutor {
             }
             else {
                 for (String bounty : playerBounties) {
-                    if (Bukkit.getOnlinePlayers().contains(Bukkit.getPlayer(UUID.fromString(bounty.split(":")[0])))) {
-                        player.sendMessage(ChatColor.GREEN + "Bounty on " + Bukkit.getPlayer(UUID.fromString(bounty.split(":")[0])).getName() + " for $" + bounty.split(":")[1]);
+                    String status = ChatColor.RED+"OFFLINE";
+                    if (Bukkit.getPlayer(UUID.fromString(bounty.split(":")[0])).isOnline()) {
+                        status = ChatColor.GREEN+"ONLINE";
                     }
+                    player.sendMessage(ChatColor.GREEN + "Bounty on " + Bukkit.getOfflinePlayer(UUID.fromString(bounty.split(":")[0])).getName() + " for $" + bounty.split(":")[1] + " " + status);
                 }
             }
         }
