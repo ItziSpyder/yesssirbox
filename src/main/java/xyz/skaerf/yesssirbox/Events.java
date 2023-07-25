@@ -69,6 +69,7 @@ public class Events implements Listener {
         for (String line : bounties) {
             if (UUID.fromString(line.split(":")[0]).equals(event.getEntity().getUniqueId())) {
                 double amount = Double.parseDouble(line.split(":")[1]);
+                if (amount < 0) return;
                 EconomyResponse res = Yesssirbox.econ.depositPlayer(event.getEntity().getKiller(), amount);
                 if (res.transactionSuccess()) {
                     for (Player online : Bukkit.getOnlinePlayers()) {
@@ -78,8 +79,11 @@ public class Events implements Listener {
                     Yesssirbox.getPlugin(Yesssirbox.class).getConfig().set("bounties", bounties);
                     Yesssirbox.getPlugin(Yesssirbox.class).saveConfig();
                     Yesssirbox.getPlugin(Yesssirbox.class).reloadConfig();
-                    break;
                 }
+                else {
+                    Yesssirbox.getPlugin(Yesssirbox.class).getLogger().warning("Could not deposit bounty money - "+res.errorMessage);
+                }
+                break;
             }
         }
     }
