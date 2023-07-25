@@ -52,6 +52,7 @@ public class BountyCommand implements CommandExecutor {
             double bounty;
             try {
                 bounty = Double.parseDouble(args[1]);
+                if (bounty < 0) throw new NumberFormatException();
             }
             catch (NumberFormatException e) {
                 player.sendMessage(ChatColor.RED+"Please enter a valid number! e.g. 1000");
