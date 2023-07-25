@@ -52,6 +52,7 @@ public class BountyCommand implements CommandExecutor {
             double bounty;
             try {
                 bounty = Double.parseDouble(args[1]);
+                bounty = Math.floor(bounty*100)/100;
                 if (bounty < 0) throw new NumberFormatException();
             }
             catch (NumberFormatException e) {
