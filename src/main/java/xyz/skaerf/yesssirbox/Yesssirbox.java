@@ -6,6 +6,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.skaerf.yesssirbox.cmds.BountyCommand;
@@ -80,5 +81,12 @@ public final class Yesssirbox extends JavaPlugin {
         TextComponent component = Component.text(ChatColor.translateAlternateColorCodes('&', toSend));
         player.sendActionBar(component);
         actionBars.put(player, toSend);
+    }
+
+    private boolean isVanished(Player player) {
+        for (MetadataValue meta : player.getMetadata("vanished")) {
+            if (meta.asBoolean()) return true;
+        }
+        return false;
     }
 }
