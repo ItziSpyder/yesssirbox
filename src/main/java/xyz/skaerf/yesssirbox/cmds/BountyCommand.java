@@ -28,10 +28,10 @@ public class BountyCommand implements CommandExecutor {
             else {
                 for (String bounty : playerBounties) {
                     String status = ChatColor.RED+"OFFLINE";
-                    if (Bukkit.getPlayer(UUID.fromString(bounty.split(":")[0])).isOnline()) {
+                    if (Bukkit.getPlayer(UUID.fromString(bounty.split(":")[0])) != null) {
                         status = ChatColor.GREEN+"ONLINE";
                     }
-                    player.sendMessage(ChatColor.GREEN + "Bounty on " + Bukkit.getOfflinePlayer(UUID.fromString(bounty.split(":")[0])).getName() + " for $" + bounty.split(":")[1] + " " + status);
+                    player.sendMessage(ChatColor.GOLD + "Bounty on " + Bukkit.getOfflinePlayer(UUID.fromString(bounty.split(":")[0])).getName() + " for $" + bounty.split(":")[1] + " - " + status);
                 }
             }
         }
