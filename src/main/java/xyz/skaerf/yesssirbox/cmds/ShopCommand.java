@@ -166,6 +166,7 @@ public class ShopCommand implements CommandExecutor {
         ItemStack itemStack = event.getCurrentItem();
         if (itemStack == null) return;
         event.setCancelled(true);
+        if (!canTheyHaveIt.containsKey(itemStack)) return;
         if (canTheyHaveIt.get(itemStack)) {
             YSBItemStack item = toYSB.get(itemStack);
             EconomyResponse res = Yesssirbox.econ.withdrawPlayer(player, item.getValue());
