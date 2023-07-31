@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import xyz.skaerf.yesssirbox.AutoCompressor;
 import xyz.skaerf.yesssirbox.Yesssirbox;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class YesssirboxCommand implements CommandExecutor {
         else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
             pl.reloadConfig();
             ShopCommand.setItems(pl.getConfig());
+            AutoCompressor.setCompressorItems(pl.getConfig());
             sender.sendMessage(ChatColor.GREEN+"Config reloaded!");
         }
         else if (args[0].equalsIgnoreCase("addBlock") || args[0].equalsIgnoreCase("ab")) {
