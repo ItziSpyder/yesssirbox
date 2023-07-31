@@ -8,10 +8,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import xyz.skaerf.yesssirbox.Yesssirbox;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 public class BountyCommand implements CommandExecutor {
+
+    private HashMap<Player, Long> coolDown = new HashMap<>();
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -36,6 +39,10 @@ public class BountyCommand implements CommandExecutor {
             }
         }
         else {
+            if (coolDown.get(player) != null) if (System.currentTimeMillis() - coolDown.get(player) < 5000) {
+                player.sendMessage(ChatColor.RED+"Please wait five seconds before running the command again!");
+                return true;
+            }
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
                 player.sendMessage(ChatColor.RED+"That player is not online!");
@@ -65,14 +72,14 @@ public class BountyCommand implements CommandExecutor {
             }
             List<String> playerBounties = Yesssirbox.getPlugin(Yesssirbox.class).getConfig().getStringList("bounties");
             String message = "&c&lyesssirbox &8&l>> &a"+player.getName()+" has just set a bounty of $"+bounty+" on "+target.getName()+"!";
+            double oldAmount = 0;
             for (String entry : playerBounties) if (entry.split(":")[0].equals(target.getUniqueId().toString())) {
-                double oldAmount = Double.parseDouble(entry.split(":")[1]);
+                oldAmount = Double.parseDouble(entry.split(":")[1]);
                 playerBounties.remove(entry);
                 message = message + "\nThe bounty total on "+target.getName()+" is $"+(bounty+oldAmount);
-                bounty = bounty+oldAmount;
                 break;
             }
-            playerBounties.add(target.getUniqueId()+":"+bounty);
+            playerBounties.add(target.getUniqueId()+":"+(bounty+oldAmount));
             Yesssirbox.getPlugin(Yesssirbox.class).getConfig().set("bounties", playerBounties);
             Yesssirbox.getPlugin(Yesssirbox.class).saveConfig();
             Yesssirbox.getPlugin(Yesssirbox.class).reloadConfig();
@@ -80,7 +87,8 @@ public class BountyCommand implements CommandExecutor {
                 online.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
             }
             Yesssirbox.econ.withdrawPlayer(player, bounty);
-            player.sendMessage(ChatColor.GREEN+"The bounty has been set and the money has been taken from your account.");
+            player.sendMessage(ChatColor.GREEN+"The bounty has been set and $"+bounty+" has been taken from your account.");
+            coolDown.put(player, System.currentTimeMillis());
         }
         return true;
     }
