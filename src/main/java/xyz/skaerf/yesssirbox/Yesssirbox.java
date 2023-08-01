@@ -31,6 +31,7 @@ public final class Yesssirbox extends JavaPlugin {
         getCommand("yesssirbox").setExecutor(new YesssirboxCommand());
         getCommand("addcompressor").setExecutor(new CompressToCommand());
         getCommand("autocompressor").setExecutor(new AutoCompressor());
+        getCommand("vote").setExecutor(new Vote());
         getCommand("discord").setExecutor(new DiscordCommand());
         getCommand("shop").setExecutor(new ShopCommand());
         getCommand("bounty").setExecutor(new BountyCommand());

@@ -18,3 +18,5 @@ commands:
     usage: /autocompressor
   addcompressor:
     usage: /addcompressor
+  vote:
+    description: puts Vote-Links into Player's Chat
