@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import xyz.skaerf.yesssirbox.Yesssirbox;
+import xyz.skaerf.yesssirbox.utils.ConfigUtil;
 
 import java.util.List;
 
@@ -25,6 +26,10 @@ public class CompressToCommand implements CommandExecutor {
             player.sendMessage(ChatColor.RED+"You don't have permission to do this.");
             return true;
         }
+
+        ConfigUtil config = new ConfigUtil("autocompressor.yml");
+
+
         ItemStack compressFrom = player.getInventory().getItem(0);
         ItemStack compressTo = player.getInventory().getItem(1);
         if (compressFrom == null || compressTo == null || compressFrom.getType().equals(Material.AIR) || compressTo.getType().equals(Material.AIR)) {
@@ -32,20 +37,22 @@ public class CompressToCommand implements CommandExecutor {
                     " and the item to compress to in your second slot e.g. 64 oak logs in slot 1 and 1 Compressed Log in slot 2.");
             return true;
         }
-        List<ItemStack> compressFromList = (List<ItemStack>) Yesssirbox.getPlugin(Yesssirbox.class).getConfig().getList("compressFrom");
-        List<ItemStack> compressToList = (List<ItemStack>) Yesssirbox.getPlugin(Yesssirbox.class).getConfig().getList("compressTo");
+        config.getConfig().set("hello", "world");
+        config.save();
+        /*List<ItemStack> compressFromList = (List<ItemStack>) config.getConfig().getList("compressFrom");
+        List<ItemStack> compressToList = (List<ItemStack>) config.getConfig().getList("compressTo");
 
         compressFromList.add(compressFrom);
         compressToList.add(compressTo);
         if (compressFromList.size() != compressToList.size()) {
-            player.sendMessage(ChatColor.RED+"There has been a critical error. Please report this to skaerf:\nListLengthMismatch");
+            player.sendMessage(ChatColor.RED+"There has been a critical error. Please report this to skaerf or Sidiju:\nListLengthMismatch");
             return true;
         }
-        Yesssirbox.getPlugin(Yesssirbox.class).getConfig().set("compressFrom", compressFromList);
-        Yesssirbox.getPlugin(Yesssirbox.class).getConfig().set("compressTo", compressToList);
-        Yesssirbox.getPlugin(Yesssirbox.class).saveConfig();
-        Yesssirbox.getPlugin(Yesssirbox.class).reloadConfig();
+        config.getConfig().set("compressFrom", compressFromList);
+        config.getConfig().set("compressTo", compressToList);
+        config.save();
+        config.reload();
         player.sendMessage(ChatColor.GREEN+"Successfully saved new compress translation to config.");
-        return true;
+        */return true;
     }
 }

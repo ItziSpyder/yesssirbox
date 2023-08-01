@@ -3,13 +3,16 @@ package xyz.skaerf.yesssirbox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.skaerf.yesssirbox.cmds.*;
+import xyz.skaerf.yesssirbox.utils.ConfigUtil;
 
 import java.util.*;
 import java.util.List;
@@ -20,6 +23,7 @@ public final class Yesssirbox extends JavaPlugin {
     public static HashMap<Material, Double> blockValues = new HashMap<>();
     private static HashMap<Player, String> actionBars = new HashMap<>();
     public static Economy econ;
+
 
     @Override
     public void onEnable() {
@@ -36,7 +40,14 @@ public final class Yesssirbox extends JavaPlugin {
         getCommand("shop").setExecutor(new ShopCommand());
         getCommand("bounty").setExecutor(new BountyCommand());
         ShopCommand.setItems(this.getConfig());
+        setupAutocompressor();
+
     }
+    public void setupAutocompressor(){
+        ConfigUtil autocompressorConfig = new ConfigUtil(this, "autocompressor.yml");
+        AutoCompressor.setCompressorItems(autocompressorConfig.getConfig());
+    }
+
 
     private void setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
