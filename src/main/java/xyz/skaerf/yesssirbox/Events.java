@@ -111,6 +111,7 @@ public class Events implements Listener {
 
     @EventHandler
     public void onInvInteract(InventoryClickEvent event) {
+        if (event.getCurrentItem() == null) {return;}
         Set<Material> shulkerBoxes = Tag.SHULKER_BOXES.getValues();
         if (event.getView().title().equals(ShopCommand.getShopInvName())) {
             ShopCommand.inventoryClick(event);

@@ -9,10 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import xyz.skaerf.yesssirbox.cmds.BountyCommand;
-import xyz.skaerf.yesssirbox.cmds.DiscordCommand;
-import xyz.skaerf.yesssirbox.cmds.ShopCommand;
-import xyz.skaerf.yesssirbox.cmds.YesssirboxCommand;
+import xyz.skaerf.yesssirbox.cmds.*;
 
 import java.util.*;
 import java.util.List;
@@ -32,6 +29,8 @@ public final class Yesssirbox extends JavaPlugin {
         refreshBlockValues();
         setupEconomy();
         getCommand("yesssirbox").setExecutor(new YesssirboxCommand());
+        getCommand("addcompressor").setExecutor(new CompressToCommand());
+        getCommand("autocompressor").setExecutor(new AutoCompressor());
         getCommand("discord").setExecutor(new DiscordCommand());
         getCommand("shop").setExecutor(new ShopCommand());
         getCommand("bounty").setExecutor(new BountyCommand());
