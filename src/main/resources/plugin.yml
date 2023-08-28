@@ -24,3 +24,5 @@ commands:
     aliases: compressor
   vote:
     description: puts Vote-Links into Player's Chat
+  offhand:
+    description: Switches the item in your main hand with your offhand

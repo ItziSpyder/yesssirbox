@@ -37,6 +37,7 @@ public final class Yesssirbox extends JavaPlugin {
         getCommand("discord").setExecutor(new DiscordCommand());
         getCommand("shop").setExecutor(new ShopCommand());
         getCommand("bounty").setExecutor(new BountyCommand());
+        getCommand("offhand").setExecutor(new OffhandCommand());
         ShopCommand.setItems(this.getConfig());
     }
 
