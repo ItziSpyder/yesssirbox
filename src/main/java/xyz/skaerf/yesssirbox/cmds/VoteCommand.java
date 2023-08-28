@@ -13,7 +13,7 @@ public class VoteCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String [] args) {
-        if (Yesssirbox.getPlugin(Yesssirbox.class).getConfig().getStringList("voteMessages") != null) {
+        if (!Yesssirbox.getPlugin(Yesssirbox.class).getConfig().getStringList("voteMessages").isEmpty()) {
             List<String> list = Yesssirbox.getPlugin(Yesssirbox.class).getConfig().getStringList("voteMessages");
             for (String str : list) {
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', str));
