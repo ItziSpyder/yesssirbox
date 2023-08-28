@@ -3,11 +3,9 @@ package xyz.skaerf.yesssirbox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,9 +31,10 @@ public final class Yesssirbox extends JavaPlugin {
         refreshBlockValues();
         setupEconomy();
         getCommand("yesssirbox").setExecutor(new YesssirboxCommand());
-        getCommand("addcompressor").setExecutor(new CompressToCommand());
-        getCommand("autocompressor").setExecutor(new AutoCompressor());
-        getCommand("vote").setExecutor(new Vote());
+        getCommand("autocompressor").setExecutor(new AutoCompressorCommand());
+        getCommand("autocompress").setExecutor(new AutoCompressCommand());
+        getCommand("compress").setExecutor(new CompressCommand());
+        getCommand("vote").setExecutor(new VoteCommand());
         getCommand("discord").setExecutor(new DiscordCommand());
         getCommand("shop").setExecutor(new ShopCommand());
         getCommand("bounty").setExecutor(new BountyCommand());
@@ -94,7 +93,7 @@ public final class Yesssirbox extends JavaPlugin {
         actionBars.put(player, toSend);
     }
 
-    private boolean isVanished(Player player) {
+    public static boolean isVanished(Player player) {
         for (MetadataValue meta : player.getMetadata("vanished")) {
             if (meta.asBoolean()) return true;
         }

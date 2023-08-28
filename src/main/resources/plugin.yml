@@ -1,6 +1,6 @@
 name: yesssirbox
 version: master-2.5
-authors: [skaerf]
+authors: [skaerf, Sidiju]
 main: xyz.skaerf.yesssirbox.Yesssirbox
 api-version: 1.18
 depend: [Vault]
@@ -16,7 +16,11 @@ commands:
     usage: /bounty
   autocompressor:
     usage: /autocompressor
-  addcompressor:
-    usage: /addcompressor
+  autocompress:
+    description: turns Autocompressor on
+    aliases: [ ac,autocomp ]
+  compress:
+    description: Compresses CommandSender's Item
+    aliases: compressor
   vote:
     description: puts Vote-Links into Player's Chat

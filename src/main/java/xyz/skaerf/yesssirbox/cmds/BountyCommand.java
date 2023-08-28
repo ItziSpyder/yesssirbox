@@ -1,5 +1,6 @@
 package xyz.skaerf.yesssirbox.cmds;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -29,12 +30,12 @@ public class BountyCommand implements CommandExecutor {
                 player.sendMessage(ChatColor.GREEN+"There are no bounties open at the moment! Check back later, or create your own with "+ChatColor.BOLD +"/bounty <player> <amount> "+ChatColor.GREEN+"!");
             }
             else {
+                player.sendMessage(Component.text(ChatColor.GREEN+"Showing bounties for online players only."));
                 for (String bounty : playerBounties) {
-                    String status = ChatColor.RED+"OFFLINE";
-                    if (Bukkit.getPlayer(UUID.fromString(bounty.split(":")[0])) != null) {
-                        status = ChatColor.GREEN+"ONLINE";
+                    Player target = Bukkit.getPlayer(UUID.fromString(bounty.split(":")[0]));
+                    if (target != null && !Yesssirbox.isVanished(target)) {
+                        player.sendMessage(ChatColor.GOLD + "Bounty on " + Bukkit.getOfflinePlayer(UUID.fromString(bounty.split(":")[0])).getName() + " for $" + bounty.split(":")[1]);
                     }
-                    player.sendMessage(ChatColor.GOLD + "Bounty on " + Bukkit.getOfflinePlayer(UUID.fromString(bounty.split(":")[0])).getName() + " for $" + bounty.split(":")[1] + " - " + status);
                 }
             }
         }
@@ -74,7 +75,7 @@ public class BountyCommand implements CommandExecutor {
             String message = "&c&lyesssirbox &8&l>> &a"+player.getName()+" has just set a bounty of $"+bounty+" on "+target.getName()+"!";
             double oldAmount = 0;
             for (String entry : playerBounties) if (entry.split(":")[0].equals(target.getUniqueId().toString())) {
-                oldAmount = Double.parseDouble(entry.split(":")[1]);
+                 oldAmount = Double.parseDouble(entry.split(":")[1]);
                 playerBounties.remove(entry);
                 message = message + "\nThe bounty total on "+target.getName()+" is $"+(bounty+oldAmount);
                 break;
