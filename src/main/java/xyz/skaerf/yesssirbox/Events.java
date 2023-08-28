@@ -2,7 +2,6 @@ package xyz.skaerf.yesssirbox;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -104,9 +103,6 @@ public class Events implements Listener {
         catch (NullPointerException ignored) {}
         lastBlockBroken.remove(player);
         lastBlockBroken.put(player, time);
-        if (event.getPlayer().getInventory().contains(event.getBlock().getType(), 64) && player.hasPermission("yesssirbox.compress")) {
-            AutoCompressor.autoCompress(event);
-        }
     }
 
     @EventHandler

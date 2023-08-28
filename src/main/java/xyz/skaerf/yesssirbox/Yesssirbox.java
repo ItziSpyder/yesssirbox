@@ -10,9 +10,8 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.skaerf.yesssirbox.cmds.*;
-import xyz.skaerf.yesssirbox.utils.ConfigUtil;
 
-import java.util.*;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -39,12 +38,6 @@ public final class Yesssirbox extends JavaPlugin {
         getCommand("shop").setExecutor(new ShopCommand());
         getCommand("bounty").setExecutor(new BountyCommand());
         ShopCommand.setItems(this.getConfig());
-        setupAutocompressor();
-
-    }
-    public void setupAutocompressor(){
-        ConfigUtil autocompressorConfig = new ConfigUtil(this, "autocompressor.yml");
-        AutoCompressor.setCompressorItems(autocompressorConfig.getConfig());
     }
 
 
