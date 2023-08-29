@@ -1,5 +1,5 @@
 name: yesssirbox
-version: master-2.5
+version: 5.0
 authors: [skaerf, Sidiju]
 main: xyz.skaerf.yesssirbox.Yesssirbox
 api-version: 1.18
@@ -26,3 +26,5 @@ commands:
     description: puts Vote-Links into Player's Chat
   offhand:
     description: Switches the item in your main hand with your offhand
+  daily:
+    description: Daily commands - runnable every 24hrs

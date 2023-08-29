@@ -11,14 +11,17 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.skaerf.yesssirbox.cmds.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 
 public final class Yesssirbox extends JavaPlugin {
 
     public static HashMap<Material, Double> blockValues = new HashMap<>();
     private static HashMap<Player, String> actionBars = new HashMap<>();
+    private static HashMap<UUID, Long> dailies = new HashMap<>();
     public static Economy econ;
 
 
@@ -38,7 +41,15 @@ public final class Yesssirbox extends JavaPlugin {
         getCommand("shop").setExecutor(new ShopCommand());
         getCommand("bounty").setExecutor(new BountyCommand());
         getCommand("offhand").setExecutor(new OffhandCommand());
+        getCommand("daily").setExecutor(new DailyCommand());
         ShopCommand.setItems(this.getConfig());
+        setDailies();
+    }
+
+    @Override
+    public void onDisable() {
+        saveDailies();
+        saveConfig();
     }
 
 
@@ -60,6 +71,26 @@ public final class Yesssirbox extends JavaPlugin {
                 blockValues.put(Material.valueOf(i.split(":")[0]), Double.parseDouble(i.split(":")[1]));
             }
         }
+    }
+
+    private void setDailies() {
+        List<String> dailies = getConfig().getStringList("dailies");
+        if (dailies.isEmpty()) return;
+        for (String daily : dailies) {
+            getDailies().put(UUID.fromString(daily.split(":")[0]), Long.parseLong(daily.split(":")[1]));
+        }
+    }
+
+    private void saveDailies() {
+        List<String> dailyList = new ArrayList<>();
+        for (UUID uuid : dailies.keySet()) {
+            dailyList.add(uuid.toString()+":"+dailies.get(uuid));
+        }
+        getConfig().set("dailies", dailyList);
+    }
+
+    public static HashMap<UUID, Long> getDailies() {
+        return dailies;
     }
 
     public static void updateActionBar(Player player, double value) {
