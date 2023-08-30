@@ -49,7 +49,7 @@ public class BountyCommand implements CommandExecutor {
                 player.sendMessage(ChatColor.RED+"That player is not online!");
                 return true;
             }
-            if (args[1] == null) {
+            if (args.length == 1) {
                 player.sendMessage(ChatColor.RED+"Please provide an amount for the bounty! e.g. 1000");
                 return true;
             }
