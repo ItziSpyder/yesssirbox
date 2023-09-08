@@ -1,10 +1,12 @@
 package xyz.skaerf.yesssirbox.cmds;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.skaerf.yesssirbox.Yesssirbox;
 
@@ -21,14 +23,22 @@ public class YesssirboxCommand implements CommandExecutor {
             return true;
         }
         if (args.length == 0) {
-            sender.sendMessage(ChatColor.GREEN+"/yesssirbox <reload/addBlock> [value]");
+            sender.sendMessage(ChatColor.GREEN+"/yesssirbox <reload/addBlock/addCompressor> [value]");
         }
         else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
             pl.reloadConfig();
             ShopCommand.setItems(pl.getConfig());
+            Yesssirbox.reloadAllConfigs();
+            Yesssirbox.loadBlockedWords();
+            Yesssirbox.loadCompressables();
+            Yesssirbox.setDailies();
             sender.sendMessage(ChatColor.GREEN+"Config reloaded!");
         }
         else if (args[0].equalsIgnoreCase("addBlock") || args[0].equalsIgnoreCase("ab")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("Console is unable to do this as you must be holding items.");
+                return true;
+            }
             if (args.length < 2) {
                 sender.sendMessage(ChatColor.RED+"Please put the value that you want the block to have! /yesssirbox addBlock [value]");
                 return true;
@@ -40,6 +50,25 @@ public class YesssirboxCommand implements CommandExecutor {
             pl.reloadConfig();
             Yesssirbox.refreshBlockValues();
             sender.sendMessage(ChatColor.GREEN+((Player)sender).getInventory().getItemInMainHand().getType().toString()+" has been added to the config with a value of $"+args[1]+"!");
+        }
+        else if (args[0].equalsIgnoreCase("ac") || args[0].equalsIgnoreCase("addCompressor")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("Console is unable to do this as you must be holding items.");
+                return true;
+            }
+            Player player = (Player) sender;
+            if (player.getInventory().getItem(0) == null || player.getInventory().getItem(1) == null) {
+                player.sendMessage(ChatColor.RED+"Please put the item that you wish to compress FROM in your first hotbar slot, and the item you want to compress TO in your second hotbar slot.");
+                return true;
+            }
+            ItemStack compressFrom = player.getInventory().getItem(0);
+            ItemStack compressTo = player.getInventory().getItem(1);
+            Yesssirbox.getCompressables().put(compressFrom, compressTo);
+            Yesssirbox.saveCompressables();
+            player.sendMessage(ChatColor.GREEN+"New compressables added.");
+        }
+        else {
+            sender.sendMessage(ChatColor.RED+"That is not a valid argument.");
         }
         return true;
     }

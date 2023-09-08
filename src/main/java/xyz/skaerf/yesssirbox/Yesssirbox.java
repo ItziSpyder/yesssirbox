@@ -5,16 +5,17 @@ import net.kyori.adventure.text.TextComponent;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.skaerf.yesssirbox.cmds.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 
 public final class Yesssirbox extends JavaPlugin {
@@ -22,7 +23,12 @@ public final class Yesssirbox extends JavaPlugin {
     public static HashMap<Material, Double> blockValues = new HashMap<>();
     private static HashMap<Player, String> actionBars = new HashMap<>();
     private static HashMap<UUID, Long> dailies = new HashMap<>();
+    private static List<String> blockedWords = new ArrayList<>();
+
+    private static HashMap<ItemStack, ItemStack> compressables = new HashMap<>();
     public static Economy econ;
+    private static YamlConfiguration compConf;
+    private static YamlConfiguration blockedWordsConf;
 
 
     @Override
@@ -44,14 +50,88 @@ public final class Yesssirbox extends JavaPlugin {
         getCommand("daily").setExecutor(new DailyCommand());
         ShopCommand.setItems(this.getConfig());
         setDailies();
+        reloadAllConfigs();
+        loadCompressables();
+        loadBlockedWords();
     }
 
     @Override
     public void onDisable() {
         saveDailies();
         saveConfig();
+        saveCompressables();
     }
 
+    public static HashMap<ItemStack, ItemStack> getCompressables() {
+        return compressables;
+    }
+
+    public static void loadCompressables() {
+        List<ItemStack> keys = (List<ItemStack>) compConf.getList("keySet");
+        List<ItemStack> values = (List<ItemStack>) compConf.getList("valueSet");
+        if (keys == null || values == null) return;
+        for (int i = 0; i < keys.size(); i++) {
+            Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info(keys.get(i).getType()+", "+keys.get(i).getAmount()+" compressing to "+values.get(i).getType()+", "+values.get(i).getAmount());
+            compressables.put(keys.get(i), values.get(i));
+        }
+    }
+
+    public static void saveCompressables() {
+        List<ItemStack> compressablesKeySet = new ArrayList<>(compressables.keySet());
+        List<ItemStack> compressablesValueSet = new ArrayList<>(compressables.values());
+        compConf.set("keySet", compressablesKeySet.toArray());
+        compConf.set("valueSet", compressablesValueSet.toArray());
+        try {
+            compConf.save(new File(Yesssirbox.getPlugin(Yesssirbox.class).getDataFolder() + File.separator + "compressables.yml"));
+        }
+        catch (IllegalArgumentException e) {
+            Yesssirbox.getPlugin(Yesssirbox.class).getLogger().severe("compressables.yml file does not exist - cannot save compressables to config. Data will be lost.");
+        }
+        catch (IOException e) {
+            Yesssirbox.getPlugin(Yesssirbox.class).getLogger().warning("IOException whilst saving compressables to file. Data may be lost.");
+        }
+        Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info("Compressables were saved to file successfully.");
+    }
+
+    public static void loadBlockedWords() {
+        // TODO load blocked words from conf
+        if (blockedWordsConf.getStringList("blockedWords").isEmpty()) {
+            Yesssirbox.getPlugin(Yesssirbox.class).getLogger().warning("blockedWords.yml is empty - language filter will be inoperable");
+            return;
+        }
+        blockedWords = blockedWordsConf.getStringList("blockedWords");
+    }
+
+    public static List<String> getBlockedWords() {
+        return blockedWords;
+    }
+
+    public static void reloadAllConfigs() {
+        File compressorFile = new File(Yesssirbox.getPlugin(Yesssirbox.class).getDataFolder()+File.separator+"compressables.yml");
+        if (!compressorFile.exists()) {
+            try {
+                if (compressorFile.createNewFile()) {
+                    Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info("Successfully created compressables.yml file");
+                }
+            }
+            catch (IOException e) {
+                Yesssirbox.getPlugin(Yesssirbox.class).getLogger().warning("Could not create compressables.yml file - please do it manually");
+            }
+        }
+        compConf = YamlConfiguration.loadConfiguration(compressorFile);
+        File blockedWordsFile = new File(Yesssirbox.getPlugin(Yesssirbox.class).getDataFolder()+File.separator+"blockedWords.yml");
+        if (!blockedWordsFile.exists()) {
+            try {
+                if (blockedWordsFile.createNewFile()) {
+                    Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info("Successfully created blockedWords.yml file");
+                }
+            }
+            catch (IOException e) {
+                Yesssirbox.getPlugin(Yesssirbox.class).getLogger().warning("Could not create blockedWords.yml file - please do it manually");
+            }
+        }
+        blockedWordsConf = YamlConfiguration.loadConfiguration(blockedWordsFile);
+    }
 
     private void setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
@@ -73,8 +153,8 @@ public final class Yesssirbox extends JavaPlugin {
         }
     }
 
-    private void setDailies() {
-        List<String> dailies = getConfig().getStringList("dailies");
+    public static void setDailies() {
+        List<String> dailies = Yesssirbox.getPlugin(Yesssirbox.class).getConfig().getStringList("dailies");
         if (dailies.isEmpty()) return;
         for (String daily : dailies) {
             getDailies().put(UUID.fromString(daily.split(":")[0]), Long.parseLong(daily.split(":")[1]));

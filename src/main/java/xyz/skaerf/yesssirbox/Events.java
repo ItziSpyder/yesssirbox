@@ -1,5 +1,8 @@
 package xyz.skaerf.yesssirbox;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -10,10 +13,13 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import xyz.skaerf.yesssirbox.cmds.ShopCommand;
 
 import java.util.*;
+import java.util.List;
 
 public class Events implements Listener {
 
@@ -21,6 +27,9 @@ public class Events implements Listener {
     private static final List<Material> chestplateList = new ArrayList<>();
     private static final List<Material> leggingsList = new ArrayList<>();
     private static final List<Material> bootsList = new ArrayList<>();
+
+    private static HashMap<Player, Integer> spamCheck = new HashMap<>();
+    private static HashMap<Player, String> lastMessage = new HashMap<>();
     public static HashMap<Player, Long> lastBlockBroken = new HashMap<>();
 
     @EventHandler
@@ -112,9 +121,51 @@ public class Events implements Listener {
         if (event.getView().title().equals(ShopCommand.getShopInvName())) {
             ShopCommand.inventoryClick(event);
         }
-        else if (shulkerBoxes.contains(event.getCurrentItem().getType()) && event.getWhoClicked().getInventory().equals(event.getInventory())) {
-            ShulkerManager.shulkerInteract(event);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onChat(AsyncChatEvent event) {
+        Player player = event.getPlayer();
+        String msg = ((TextComponent)event.message()).content().replace(" ", "").replaceAll("\\p{Punct}", "");
+        checkSpam(player, msg);
+        if (spamCheck.get(player) >= 3) {
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.RED+"Please do not spam. You have sent the same or very similar messages three times in a row - you will now be muted for one hour.");
+            spamCheck.remove(player);
+            spamCheck.put(player, 0);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tempmute "+player.getName()+" 1h Auto: Spam");
+                }
+            }.runTask(Yesssirbox.getPlugin(Yesssirbox.class));
         }
+        for (String word : Yesssirbox.getBlockedWords()) {
+            if (msg.toUpperCase().contains(word.toUpperCase())) {
+                player.sendMessage(ChatColor.RED+"Please reconsider what you have typed - it contains blocked language. Be considerate to your fellow players and do not say anything that could offend someone or cause hurt.");
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        spamCheck.put(event.getPlayer(), 0);
+    }
+
+    private void checkSpam(Player player, String newMessage) {
+        if (lastMessage.get(player) == null) {
+            lastMessage.put(player, newMessage);
+            return;
+        }
+        if (lastMessage.get(player).equals(newMessage)) {
+            if (spamCheck.get(player) != null) {
+                spamCheck.put(player, spamCheck.get(player)+1);
+                return;
+            }
+            spamCheck.put(player, 1);
+        }
+        lastMessage.put(player, newMessage);
     }
 
     public static void fillArmorLists() {
