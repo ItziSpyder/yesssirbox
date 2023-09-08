@@ -1,85 +1,56 @@
 package xyz.skaerf.yesssirbox;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class Compressable {
 
-    private static HashMap<ItemStack, ItemStack> stupidTranslations = new HashMap<>();
-
     public static boolean isCompressable(ItemStack stack) {
-        if (Yesssirbox.getCompressables().get(stack) != null) {
+        if (Yesssirbox.getCompressable(stack).isEmpty()) {
             return true;
         }
-        if (Yesssirbox.getCompressables().get(new ItemStack(stack.getType(), 1)) != null) {
+        if (Yesssirbox.getPreCompressables().get(stack) != null) {
             return true;
-        }
-        for (ItemStack req : Yesssirbox.getCompressables().keySet()) {
-            if (stack.getType().equals(req.getType()) && stack.getAmount()-req.getAmount() >= 0) {
-                if (stack.getEnchantments().equals(req.getEnchantments()) && stack.getItemMeta().equals(req.getItemMeta())) {
-                    stupidTranslations.put(stack, req);
-                    return true;
-                }
-            }
         }
         return false;
     }
 
-    public static ItemStack compress(ItemStack stack) {
+    public static List<ItemStack> compress(ItemStack stack) {
         Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info(stack.getType()+", "+stack.getAmount());
-        int resultAmount = 0;
-        int requiredForEach = 0;
-        boolean setNames = false;
-        ItemStack compressTo = Yesssirbox.getCompressables().get(stack);
-        if (compressTo == null) {
-            compressTo = Yesssirbox.getCompressables().get(new ItemStack(stack.getType(), 1));
-            if (compressTo == null) {
-                if (stupidTranslations.get(stack) != null) {
-                    Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info("compressTo was null - using a stupidTranslation");
-                    compressTo = Yesssirbox.getCompressables().get(stupidTranslations.get(stack));
-                    if (compressTo == null) return null;
-                    requiredForEach = stupidTranslations.get(stack).getAmount();
-                }
-                else {
-                    return null;
-                }
+        ItemStack compressTo = Yesssirbox.getPreCompressables().get(new ItemStack(stack.getType()));
+        if (compressTo != null) {
+            // is preCompress
+            ItemStack returnable = new ItemStack(compressTo.getType());
+            while (stack.getAmount() >= compressTo.getAmount()) {
+                stack.setAmount(stack.getAmount() - compressTo.getAmount());
+                returnable.setAmount(returnable.getAmount() + compressTo.getAmount());
             }
-            else {
-                // it do this
-                Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info(String.valueOf(compressTo.getAmount()));
-                Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info(String.valueOf(stack.getAmount()));
-                compressTo.setAmount(compressTo.getAmount() * stack.getAmount());
-            }
+            return new ArrayList<>(Arrays.asList(stack, returnable));
         }
-
-        if (compressTo.getItemMeta().hasDisplayName()) setNames = true;
-        if (requiredForEach == 0) requiredForEach = stack.getAmount();
-        if (stack.getAmount() >= compressTo.getAmount()) {
-            // loop required here - for every REQ amount of item to compress, remove from stack amount
-            while (stack.getAmount() >= requiredForEach) {
-                stack.setAmount(stack.getAmount()-requiredForEach);
-                resultAmount = resultAmount + compressTo.getAmount();
-            }
-            ItemStack compressedMaterial = new ItemStack(compressTo.getType(), resultAmount);
-            compressedMaterial.addUnsafeEnchantments(compressTo.getEnchantments());
-            ItemMeta compressedMaterialMeta = compressedMaterial.getItemMeta();
-            if (setNames) compressedMaterialMeta.displayName(compressTo.displayName());
-            compressedMaterial.setItemMeta(compressedMaterialMeta);
-            return compressedMaterial;
+        List<ItemStack> compressables = Yesssirbox.getCompressable(stack); // in an ideal world this will have three values - 0 = stack, 1 = from, 2 = to
+        if (compressables.size() == 1) return null;
+        if (compressables.size() == 2) {
+            // directly compressable stack
         }
-        else {
-            // while the amount in stack is greater than zero, add to resultAmount each loop the compressTo amount
-            Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info(String.valueOf(resultAmount));
-            resultAmount = compressTo.getAmount();
-            Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info(String.valueOf(resultAmount));
-            ItemStack compressedMaterial = new ItemStack(compressTo.getType(), resultAmount);
-            compressedMaterial.addUnsafeEnchantments(compressTo.getEnchantments());
-            ItemMeta compressedMaterialMeta = compressedMaterial.getItemMeta();
-            if (setNames) compressedMaterialMeta.displayName(compressTo.displayName());
-            compressedMaterial.setItemMeta(compressedMaterialMeta);
-            return compressedMaterial;
+        if (compressables.size() == 3) {
+            // stack is compressable, but is larger than required (can be recurred based on returned values)
         }
+        ItemStack returnable = new ItemStack(compressTo.getType());
+        if (!compressTo.getEnchantments().isEmpty()) returnable.addEnchantment(Enchantment.DAMAGE_ALL, 1);
+        if (compressTo.getItemMeta() != null) {
+            ItemMeta returnableMeta = returnable.getItemMeta();
+            returnableMeta.displayName(compressTo.displayName());
+            returnable.setItemMeta(returnableMeta);
+        }
+        while (stack.getAmount() >= compressTo.getAmount()) {
+            stack.setAmount(stack.getAmount() - compressTo.getAmount());
+            returnable.setAmount(returnable.getAmount()+compressTo.getAmount());
+        }
+        return new ArrayList<>(Arrays.asList(stack, returnable));
     }
 }

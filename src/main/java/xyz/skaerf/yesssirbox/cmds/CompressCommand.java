@@ -15,6 +15,7 @@ import xyz.skaerf.yesssirbox.Compressable;
 import xyz.skaerf.yesssirbox.Yesssirbox;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class CompressCommand implements CommandExecutor {
 
@@ -57,10 +58,11 @@ public class CompressCommand implements CommandExecutor {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        ItemStack replacement = Compressable.compress(stack);
+                        // the reason this is a list is to ensure that if the entire stack is not compressed, it is not all taken
+                        List<ItemStack> replacement = Compressable.compress(stack);
                         if (replacement != null) {
-                            player.getInventory().remove(stack);
-                            player.getInventory().addItem(replacement);
+                            player.getInventory().remove(replacement.get(0));
+                            player.getInventory().addItem(replacement.get(1));
                         }
                     }
                 }.runTask(Yesssirbox.getPlugin(Yesssirbox.class));

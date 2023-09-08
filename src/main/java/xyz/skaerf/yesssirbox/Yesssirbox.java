@@ -26,6 +26,7 @@ public final class Yesssirbox extends JavaPlugin {
     private static List<String> blockedWords = new ArrayList<>();
 
     private static HashMap<ItemStack, ItemStack> compressables = new HashMap<>();
+    private static HashMap<ItemStack, ItemStack> preCompressables = new HashMap<>();
     public static Economy econ;
     private static YamlConfiguration compConf;
     private static YamlConfiguration blockedWordsConf;
@@ -62,25 +63,63 @@ public final class Yesssirbox extends JavaPlugin {
         saveCompressables();
     }
 
-    public static HashMap<ItemStack, ItemStack> getCompressables() {
-        return compressables;
+    public static List<ItemStack> getCompressable(ItemStack stack) {
+        if (compressables.get(stack) != null) {
+            return new ArrayList<>(Arrays.asList(stack, compressables.get(stack)));
+        }
+        for (ItemStack compressable : compressables.keySet()) {
+            if (compressable.getType().equals(stack.getType()) && compressable.getAmount() >= stack.getAmount()) {
+                if (compressable.getItemMeta().hasDisplayName()) {
+                    if (compressable.displayName().equals(stack.displayName())) {
+                        return new ArrayList<>(Arrays.asList(stack, compressable));
+                    }
+                }
+                return new ArrayList<>(Arrays.asList(stack, compressable, compressables.get(compressable)));
+            }
+        }
+        return new ArrayList<>(Collections.singletonList(stack));
+    }
+
+    public static HashMap<ItemStack, ItemStack> getPreCompressables() {
+        return preCompressables;
     }
 
     public static void loadCompressables() {
-        List<ItemStack> keys = (List<ItemStack>) compConf.getList("keySet");
-        List<ItemStack> values = (List<ItemStack>) compConf.getList("valueSet");
-        if (keys == null || values == null) return;
-        for (int i = 0; i < keys.size(); i++) {
-            Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info(keys.get(i).getType()+", "+keys.get(i).getAmount()+" compressing to "+values.get(i).getType()+", "+values.get(i).getAmount());
-            compressables.put(keys.get(i), values.get(i));
+        List<?> compKeySet = compConf.getList("compKeySet");
+        List<?> compValueSet = compConf.getList("compValueSet");
+        List<?> preCompKeySet = compConf.getList("preCompKeySet");
+        List<?> preCompValueSet = compConf.getList("preCompValueSet");
+        if (compKeySet == null || compValueSet == null || preCompKeySet == null || preCompValueSet == null) return;
+        for (int i = 0; i < compKeySet.size(); i++) {
+            // assume that all can be cast to ItemStack rather than having an unchecked List cast
+            Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info(((ItemStack)compKeySet.get(i)).getType()+", "+((ItemStack)compKeySet.get(i)).getAmount()+" compressing to "+((ItemStack)compValueSet.get(i)).getType()+", "+((ItemStack)compValueSet.get(i)).getAmount());
+            compressables.put(((ItemStack)compKeySet.get(i)), ((ItemStack)compValueSet.get(i)));
+        }
+        for (int i = 0; i < preCompKeySet.size(); i++) {
+            // assume that all can be cast to ItemStack rather than having an unchecked List cast
+            Yesssirbox.getPlugin(Yesssirbox.class).getLogger().info(((ItemStack)preCompKeySet.get(i)).getType()+", "+((ItemStack)preCompKeySet.get(i)).getAmount()+" pre-compressing to "+((ItemStack)preCompValueSet.get(i)).getType()+", "+((ItemStack)preCompValueSet.get(i)).getAmount());
+            preCompressables.put(((ItemStack)preCompKeySet.get(i)), ((ItemStack)preCompValueSet.get(i)));
         }
     }
 
     public static void saveCompressables() {
-        List<ItemStack> compressablesKeySet = new ArrayList<>(compressables.keySet());
-        List<ItemStack> compressablesValueSet = new ArrayList<>(compressables.values());
-        compConf.set("keySet", compressablesKeySet.toArray());
-        compConf.set("valueSet", compressablesValueSet.toArray());
+        List<ItemStack> compressablesKeySet = new ArrayList<>();
+        List<ItemStack> compressablesValueSet = new ArrayList<>();
+        List<ItemStack> preCompressablesKeySet = new ArrayList<>();
+        List<ItemStack> preCompressablesValueSet = new ArrayList<>();
+        // use compressables.entrySet() instead as it is more reliable
+        for (Map.Entry<ItemStack, ItemStack> entry : compressables.entrySet()) {
+            compressablesKeySet.add(entry.getKey());
+            compressablesValueSet.add(entry.getValue());
+        }
+        for (Map.Entry<ItemStack, ItemStack> entry : preCompressables.entrySet()) {
+            preCompressablesKeySet.add(entry.getKey());
+            preCompressablesValueSet.add(entry.getValue());
+        }
+        compConf.set("compKeySet", compressablesKeySet.toArray());
+        compConf.set("compValueSet", compressablesValueSet.toArray());
+        compConf.set("preCompKeySet", preCompressablesKeySet.toArray());
+        compConf.set("preCompValueSet", preCompressablesValueSet.toArray());
         try {
             compConf.save(new File(Yesssirbox.getPlugin(Yesssirbox.class).getDataFolder() + File.separator + "compressables.yml"));
         }
