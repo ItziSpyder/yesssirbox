@@ -125,6 +125,7 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onChat(AsyncChatEvent event) {
+        /*
         Player player = event.getPlayer();
         String msg = ((TextComponent)event.message()).content().replace(" ", "").replaceAll("\\p{Punct}", "");
         checkSpam(player, msg);
@@ -145,7 +146,7 @@ public class Events implements Listener {
                 player.sendMessage(ChatColor.RED+"Please reconsider what you have typed - it contains blocked language. Be considerate to your fellow players and do not say anything that could offend someone or cause hurt.");
                 event.setCancelled(true);
             }
-        }
+        }*/
     }
 
     @EventHandler
