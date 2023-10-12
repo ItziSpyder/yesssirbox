@@ -21,12 +21,12 @@ import java.util.*;
 public final class Yesssirbox extends JavaPlugin {
 
     public static HashMap<Material, Double> blockValues = new HashMap<>();
-    private static HashMap<Player, String> actionBars = new HashMap<>();
-    private static HashMap<UUID, Long> dailies = new HashMap<>();
+    private static final HashMap<Player, String> actionBars = new HashMap<>();
+    private static final HashMap<UUID, Long> dailies = new HashMap<>();
     private static List<String> blockedWords = new ArrayList<>();
 
-    private static HashMap<ItemStack, ItemStack> compressables = new HashMap<>();
-    private static HashMap<ItemStack, ItemStack> preCompressables = new HashMap<>();
+    private static final HashMap<ItemStack, ItemStack> compressables = new HashMap<>();
+    private static final HashMap<ItemStack, ItemStack> preCompressables = new HashMap<>();
     public static Economy econ;
     private static YamlConfiguration compConf;
     private static YamlConfiguration blockedWordsConf;
@@ -102,6 +102,14 @@ public final class Yesssirbox extends JavaPlugin {
         }
     }
 
+    public static void addToCompressables(ItemStack from, ItemStack to) {
+        compressables.put(from, to);
+    }
+
+    public static void addToPreCompressables(ItemStack from, ItemStack to) {
+        preCompressables.put(from, to);
+    }
+
     public static void saveCompressables() {
         List<ItemStack> compressablesKeySet = new ArrayList<>();
         List<ItemStack> compressablesValueSet = new ArrayList<>();
@@ -116,6 +124,7 @@ public final class Yesssirbox extends JavaPlugin {
             preCompressablesKeySet.add(entry.getKey());
             preCompressablesValueSet.add(entry.getValue());
         }
+        System.out.println(compressablesKeySet);
         compConf.set("compKeySet", compressablesKeySet.toArray());
         compConf.set("compValueSet", compressablesValueSet.toArray());
         compConf.set("preCompKeySet", preCompressablesKeySet.toArray());
@@ -133,7 +142,6 @@ public final class Yesssirbox extends JavaPlugin {
     }
 
     public static void loadBlockedWords() {
-        // TODO load blocked words from conf
         if (blockedWordsConf.getStringList("blockedWords").isEmpty()) {
             Yesssirbox.getPlugin(Yesssirbox.class).getLogger().warning("blockedWords.yml is empty - language filter will be inoperable");
             return;

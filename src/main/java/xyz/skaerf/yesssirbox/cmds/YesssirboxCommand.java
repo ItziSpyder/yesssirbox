@@ -1,13 +1,13 @@
 package xyz.skaerf.yesssirbox.cmds;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import xyz.skaerf.yesssirbox.Yesssirbox;
 
 import java.util.List;
@@ -17,13 +17,13 @@ public class YesssirboxCommand implements CommandExecutor {
     JavaPlugin pl = Yesssirbox.getPlugin(Yesssirbox.class);
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player) if (!sender.hasPermission("yesssirbox.admin")) {
             sender.sendMessage(ChatColor.RED+"You don't have permission to execute this command!");
             return true;
         }
         if (args.length == 0) {
-            sender.sendMessage(ChatColor.GREEN+"/yesssirbox <reload/addBlock/addCompressor> [value]");
+            sender.sendMessage(ChatColor.GREEN+"/yesssirbox <reload/addBlock/addCompressor> [value/pre]");
         }
         else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
             pl.reloadConfig();
@@ -61,9 +61,12 @@ public class YesssirboxCommand implements CommandExecutor {
                 player.sendMessage(ChatColor.RED+"Please put the item that you wish to compress FROM in your first hotbar slot, and the item you want to compress TO in your second hotbar slot.");
                 return true;
             }
+            if (args.length == 2 && args[1].equalsIgnoreCase("pre")) {
+                player.sendMessage(ChatColor.GREEN+"Item is being saved as a pre-compression. This ignores meta.");
+            }
             ItemStack compressFrom = player.getInventory().getItem(0);
             ItemStack compressTo = player.getInventory().getItem(1);
-            Yesssirbox.getCompressables().put(compressFrom, compressTo);
+            Yesssirbox.addToCompressables(compressFrom, compressTo);
             Yesssirbox.saveCompressables();
             player.sendMessage(ChatColor.GREEN+"New compressables added.");
         }
