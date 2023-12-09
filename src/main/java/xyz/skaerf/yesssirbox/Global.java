@@ -1,8 +1,22 @@
 package xyz.skaerf.yesssirbox;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public interface Global {
+
+    default <T extends JavaPlugin> T getPlugin(Class<T> pluginClass) {
+        return JavaPlugin.getPlugin(pluginClass);
+    }
+
+    default Yesssirbox getThisPlugin() {
+        return getPlugin(Yesssirbox.class);
+    }
+
+    default void runSync(Runnable task) {
+        Bukkit.getScheduler().runTask(getThisPlugin(), task);
+    }
 
     default void info(CommandSender sender, String msg) {
         sender.sendMessage(msg.replace('&', '§'));

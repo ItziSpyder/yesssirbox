@@ -34,7 +34,7 @@ public class YesssirboxCommand implements Command {
             Yesssirbox.loadBlockedWords();
             Yesssirbox.loadCompressables();
             Yesssirbox.setDailies();
-            sender.sendMessage(ChatColor.GREEN+"Config reloaded!");
+            info(sender, "&aConfig reloaded!");
         }
         else if (args.match(0, "addblock") || args.match(0, "ab")) {
             if (!(sender instanceof Player)) {

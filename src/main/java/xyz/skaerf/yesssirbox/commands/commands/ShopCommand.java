@@ -35,12 +35,12 @@ public class ShopCommand implements Command {
 
     @Override
     public void dispatchCommand(CommandSender sender, Args args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage("go away");
             return;
         }
         if (args.getSize() != 0 && sender.hasPermission("yesssirbox.admin")) {
-            if (args.getSize() == 4 && ((Player) sender).getInventory().getItem(0) != null) {
+            if (args.getSize() == 4 && player.getInventory().getItem(0) != null) {
                 ItemStack inh = ((Player) sender).getInventory().getItem(0);
                 assert inh != null;
                 YSBItemStack item = new YSBItemStack(inh.getType(), inh.getAmount());

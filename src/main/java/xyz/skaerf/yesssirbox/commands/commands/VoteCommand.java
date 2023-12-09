@@ -17,10 +17,7 @@ public class VoteCommand implements Command {
             error(sender, "Please ask a staff member for the Vote-Links!");
             return;
         }
-
-        for (String str : list) {
-            info(sender, str);
-        }
+        list.forEach(s -> info(sender, s));
     }
 
     @Override

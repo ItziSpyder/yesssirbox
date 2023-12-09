@@ -1,11 +1,8 @@
 package xyz.skaerf.yesssirbox.commands.commands;
 
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import xyz.skaerf.yesssirbox.Yesssirbox;
 import xyz.skaerf.yesssirbox.commands.Args;
 import xyz.skaerf.yesssirbox.commands.Command;
 import xyz.skaerf.yesssirbox.commands.CommandName;
@@ -34,22 +31,22 @@ public class CompressCommand implements Command {
     }
 
     public void compress(Player player) {
-        for (int i = 0; i < 36; i++) {
-            ItemStack stack = player.getInventory().getItem(i);
-            if (stack != null && !stack.getType().equals(Material.AIR)) { // && isCompressable
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        // the reason this is a list is to ensure that if the entire stack is not compressed, it is not all taken
-                        List<ItemStack> replacement = Compressable.compress(stack);
-                        System.out.println(replacement);
-                        if (replacement != null) {
-                            player.getInventory().remove(replacement.get(0));
-                            player.getInventory().addItem(replacement.get(1));
-                        }
-                    }
-                }.runTask(Yesssirbox.getPlugin(Yesssirbox.class));
-            }
+        for (ItemStack stack : player.getInventory().getContents()) {
+            compressItem(player, stack);
         }
+    }
+
+    public void compressItem(Player player, ItemStack stack) {
+        if (stack != null && !stack.getType().isAir()) { // && isCompressable
+            return;
+        }
+        runSync(() -> {
+            List<ItemStack> replacement = Compressable.compress(stack);
+            System.out.println(replacement);
+            if (replacement != null) {
+                player.getInventory().remove(replacement.get(0));
+                player.getInventory().addItem(replacement.get(1));
+            }
+        });
     }
 }
