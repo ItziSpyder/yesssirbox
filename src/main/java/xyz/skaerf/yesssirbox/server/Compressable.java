@@ -1,10 +1,13 @@
-package xyz.skaerf.yesssirbox;
+package xyz.skaerf.yesssirbox.server;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import xyz.skaerf.yesssirbox.Yesssirbox;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Compressable {
 

@@ -11,7 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import xyz.skaerf.yesssirbox.cmds.*;
+import xyz.skaerf.yesssirbox.commands.commands.*;
+import xyz.skaerf.yesssirbox.server.Events;
 
 import java.io.File;
 import java.io.IOException;

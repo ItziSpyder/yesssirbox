@@ -1,35 +1,36 @@
-package xyz.skaerf.yesssirbox.cmds;
+package xyz.skaerf.yesssirbox.commands.commands;
 
-import net.kyori.adventure.text.Component;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
-import xyz.skaerf.yesssirbox.Compressable;
 import xyz.skaerf.yesssirbox.Yesssirbox;
+import xyz.skaerf.yesssirbox.commands.Args;
+import xyz.skaerf.yesssirbox.commands.Command;
+import xyz.skaerf.yesssirbox.commands.CommandName;
+import xyz.skaerf.yesssirbox.commands.completions.CompletionBuilder;
+import xyz.skaerf.yesssirbox.server.Compressable;
 
-import java.util.HashMap;
 import java.util.List;
 
-public class CompressCommand implements CommandExecutor {
-
-    HashMap<ItemStack, ItemStack> compressTo = new HashMap<>();
+@CommandName("compress")
+public class CompressCommand implements Command {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String [] args) {
+    public void dispatchCommand(CommandSender sender, Args args) {
         Player player = (Player) sender;
         if (!player.hasPermission("syesssirbox.compress")) {
-            player.sendMessage(Component.text(ChatColor.RED+"You don't have permission to use compression! You can buy it on the store though. /buy"));
-            return true;
+            error(sender, "You don't have permission to use compression! You can buy it on the store though. /buy");
+            return;
         }
         compress(player);
-        player.sendMessage(ChatColor.GREEN + "Your inventory has been compressed.");
-        return false;
+        info(sender, "&aYour inventory has been compressed.");
+    }
+
+    @Override
+    public void dispatchCompletions(CompletionBuilder b) {
+
     }
 
     public void compress(Player player) {

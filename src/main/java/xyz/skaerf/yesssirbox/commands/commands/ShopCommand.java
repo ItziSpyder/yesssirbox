@@ -1,4 +1,4 @@
-package xyz.skaerf.yesssirbox.cmds;
+package xyz.skaerf.yesssirbox.commands.commands;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -7,8 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -20,30 +18,35 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.skaerf.yesssirbox.YSBItemStack;
 import xyz.skaerf.yesssirbox.Yesssirbox;
+import xyz.skaerf.yesssirbox.commands.Args;
+import xyz.skaerf.yesssirbox.commands.Command;
+import xyz.skaerf.yesssirbox.commands.CommandName;
+import xyz.skaerf.yesssirbox.commands.completions.CompletionBuilder;
 
 import java.util.*;
 
-public class ShopCommand implements CommandExecutor {
+@CommandName("shop")
+public class ShopCommand implements Command {
 
-    private static Component shopInvName = Component.text("Shop");
-    private static HashMap<Integer, YSBItemStack> shopItems = new HashMap<>();
-    private static HashMap<ItemStack, YSBItemStack> toYSB = new HashMap<>();
-    private static HashMap<ItemStack, Boolean> canTheyHaveIt = new HashMap<>();
+    private static final Component shopInvName = Component.text("Shop");
+    private static final HashMap<Integer, YSBItemStack> shopItems = new HashMap<>();
+    private static final HashMap<ItemStack, YSBItemStack> toYSB = new HashMap<>();
+    private static final HashMap<ItemStack, Boolean> canTheyHaveIt = new HashMap<>();
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    public void dispatchCommand(CommandSender sender, Args args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("go away");
-            return true;
+            return;
         }
-        if (args.length != 0 && sender.hasPermission("yesssirbox.admin")) {
-            if (args.length == 4 && ((Player) sender).getInventory().getItem(0) != null) {
+        if (args.getSize() != 0 && sender.hasPermission("yesssirbox.admin")) {
+            if (args.getSize() == 4 && ((Player) sender).getInventory().getItem(0) != null) {
                 ItemStack inh = ((Player) sender).getInventory().getItem(0);
                 assert inh != null;
                 YSBItemStack item = new YSBItemStack(inh.getType(), inh.getAmount());
                 item.setItemMeta(inh.getItemMeta());
                 List<ItemStack> toCraft = new ArrayList<>();
-                for (int i = 1; i < Integer.parseInt(args[3]); i++) {
+                for (int i = 1; i < args.get(3).intValue(); i++) {
                     ItemStack it = ((Player) sender).getInventory().getItem(i);
                     if (it != null) toCraft.add(it);
                 }
@@ -51,12 +54,12 @@ public class ShopCommand implements CommandExecutor {
                 int slot;
                 double cost;
                 try {
-                    slot = Integer.parseInt(args[1]);
-                    cost = Double.parseDouble(args[2]);
+                    slot = args.get(1).intValue();
+                    cost = args.get(2).doubleValue();
                 }
                 catch (NumberFormatException e) {
                     displayShop((Player)sender);
-                    return true;
+                    return;
                 }
                 item.setValue(cost);
                 this.saveItemToConfig(item, slot);
@@ -64,7 +67,11 @@ public class ShopCommand implements CommandExecutor {
             }
         }
         displayShop((Player)sender);
-        return true;
+    }
+
+    @Override
+    public void dispatchCompletions(CompletionBuilder b) {
+
     }
 
     private void saveItemToConfig(YSBItemStack item, int location) {

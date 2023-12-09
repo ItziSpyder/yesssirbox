@@ -1,27 +1,30 @@
-package xyz.skaerf.yesssirbox.cmds;
+package xyz.skaerf.yesssirbox.commands.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import xyz.skaerf.yesssirbox.Yesssirbox;
+import xyz.skaerf.yesssirbox.commands.Args;
+import xyz.skaerf.yesssirbox.commands.Command;
+import xyz.skaerf.yesssirbox.commands.CommandName;
+import xyz.skaerf.yesssirbox.commands.completions.CompletionBuilder;
 
 import java.time.Duration;
 import java.util.List;
 
-public class DailyCommand implements CommandExecutor {
+@CommandName("daily")
+public class DailyCommand implements Command {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("You cannot the daily because player the are you not\nThank you have a nice day");
-            return true;
+    public void dispatchCommand(CommandSender sender, Args args) {
+        if (!(sender instanceof Player player)) {
+            error(sender, "You cannot the daily because player the are you not\nThank you have a nice day");
+            return;
         }
-        Player player = (Player) sender;
+
         if (Yesssirbox.getDailies().get(player.getUniqueId()) != null) {
-            Long time = System.currentTimeMillis()-Yesssirbox.getDailies().get(player.getUniqueId());
+            long time = System.currentTimeMillis()-Yesssirbox.getDailies().get(player.getUniqueId());
             Duration duration = Duration.ofMillis(86400000-time);
             long seconds = duration.getSeconds();
             long HH = seconds / 3600;
@@ -31,19 +34,23 @@ public class DailyCommand implements CommandExecutor {
             if (time <= 86400000) {
                 // twenty for of hour
                 player.sendMessage(ChatColor.RED+"Please wait 24 hours before running this command again! You have "+timeInHHMMSS+" remaining.");
-                return true;
+                return;
             }
         }
         // do the actual stuff here - run every cmd in a list from config via console dispatchCommand()
         List<String> cmds = Yesssirbox.getPlugin(Yesssirbox.class).getConfig().getStringList("dailyCommands");
         if (cmds.isEmpty()) {
             player.sendMessage(ChatColor.RED+"There are no daily commands for today! Please check back later.");
-            return true;
+            return;
         }
         for (String command : cmds) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
         }
         Yesssirbox.getDailies().put(player.getUniqueId(), System.currentTimeMillis());
-        return true;
+    }
+
+    @Override
+    public void dispatchCompletions(CompletionBuilder b) {
+
     }
 }
