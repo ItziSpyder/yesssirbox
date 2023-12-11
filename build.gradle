@@ -2,18 +2,27 @@ plugins {
     id 'java'
 }
 
-group = 'xyz.skaerf'
-version = '1.0'
+jar {
+    from {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it);
+        }
+    }
+}
+
+group = 'me.trouper'
+version = '0.0.1'
 
 repositories {
     mavenCentral()
     maven {
-        name = 'papermc-repo'
-        url = 'https://repo.papermc.io/repository/maven-public/'
+        name = "papermc-repo"
+        url = "https://repo.papermc.io/repository/maven-public/"
     }
     maven {
-        name = 'sonatype'
-        url = 'https://oss.sonatype.org/content/groups/public/'
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/groups/public/"
     }
     maven {
         url = 'https://jitpack.io'
@@ -21,8 +30,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT'
+    compileOnly "io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT"
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
+    compileOnly "com.github.LeonMangler:SuperVanish:6.2.18-3"
+    implementation files('libs/PDK-1.2.jar');
 }
 
 def targetJavaVersion = 17
@@ -37,8 +48,8 @@ java {
 
 compileJava.options.encoding = 'UTF-8'
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.encoding = 'UTF-8'
         options.release = targetJavaVersion
     }
 }

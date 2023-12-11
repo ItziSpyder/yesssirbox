@@ -1,30 +1,29 @@
-name: yesssirbox
-version: 5.0
-authors: [skaerf, Sidiju]
-main: xyz.skaerf.yesssirbox.Yesssirbox
-api-version: 1.18
-depend: [Vault]
+name: YessirBox
+version: '${version}'
+main: me.trouper.yessirbox.YessirBox
+api-version: 1.20
+authors: [ ImproperIssues ]
+description: im lazy
 commands:
-  yesssirbox:
-    usage: /yesssirbox <reload/addBlock> [value]
-    aliases: [yb,ysb]
-  discord:
-    usage: /discord
-  shop:
-    usage: /shop
-  bounty:
-    usage: /bounty
+  compress:
+    usage: /compress
+    permission: yessirbox.compress
+  ysb:
+    usage: /ysb <compress> <add|remove>
+    permission: yessirbox.admin
   autocompressor:
     usage: /autocompressor
-  autocompress:
-    description: turns Autocompressor on
-    aliases: [ ac,autocomp ]
-  compress:
-    description: Compresses CommandSender's Item
-    aliases: compressor
+    permission: yessirbox.autocompressor
+  bounty:
+    usage: /bounty <set|cancel|check> <player> [<amount>] [<duration>]
+  discord:
+    usage: /discord
   vote:
-    description: puts Vote-Links into Player's Chat
-  offhand:
-    description: Switches the item in your main hand with your offhand
-  daily:
-    description: Daily commands - runnable every 24hrs
+    usage: /vote
+permissions:
+  yessirbox.admin:
+    description: Allows full access to the /ysb admin command
+  yessirbox.compress:
+    decription: Ability to use the /compress command
+  yessirbox.toggleautocompress:
+    description: Allows access to the autoCompression enchant, and toggle command
