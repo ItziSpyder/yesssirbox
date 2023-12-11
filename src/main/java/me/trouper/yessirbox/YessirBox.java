@@ -3,6 +3,7 @@ package me.trouper.yessirbox;
 import io.github.itzispyder.pdk.PDK;
 import io.github.itzispyder.pdk.utils.misc.JsonSerializable;
 import me.trouper.yessirbox.commands.*;
+import me.trouper.yessirbox.data.BountyStorage;
 import me.trouper.yessirbox.data.Config;
 import me.trouper.yessirbox.events.AutoCompressorEvent;
 import me.trouper.yessirbox.events.BountyEvent;
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
 
 public final class YessirBox extends JavaPlugin {
     public static Config config = JsonSerializable.load("plugins/YessirBox/config.json", Config.class, new Config());
+    public static BountyStorage bounties = JsonSerializable.load("plugins/YessirBox/bounties.json", BountyStorage.class, new BountyStorage());
     private static YessirBox instance;
     public static final Logger log = Bukkit.getLogger();
     public static final CompressionRegistry compressionRegistry = JsonSerializable.load("plugins/YessirBox/compressions.json", CompressionRegistry.class, new CompressionRegistry());
