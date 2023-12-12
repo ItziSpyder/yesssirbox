@@ -17,9 +17,9 @@ import java.util.logging.Logger;
 
 public final class YessirBox extends JavaPlugin {
     public static Config config = JsonSerializable.load("plugins/YessirBox/config.json", Config.class, new Config());
-    public static BountyStorage bounties = JsonSerializable.load("plugins/YessirBox/bounties.json", BountyStorage.class, new BountyStorage());
     private static YessirBox instance;
     public static final Logger log = Bukkit.getLogger();
+    public static final BountyStorage bounties = JsonSerializable.load("plugins/YessirBox/bounties.json", BountyStorage.class, new BountyStorage());
     public static final CompressionRegistry compressionRegistry = JsonSerializable.load("plugins/YessirBox/compressions.json", CompressionRegistry.class, new CompressionRegistry());
     public static Economy econ;
 
@@ -44,9 +44,7 @@ public final class YessirBox extends JavaPlugin {
 
     public static void reloadKonfig() {
         config = JsonSerializable.load("plugins/YessirBox/config.json", Config.class, new Config());
-        bounties = JsonSerializable.load("plugins/YessirBox/bounties.json", BountyStorage.class, new BountyStorage());
         config.save();
-        bounties.save();
     }
 
     public void initEvents() {
@@ -74,5 +72,11 @@ public final class YessirBox extends JavaPlugin {
     }
     public static YessirBox getInstance() {
         return instance;
+    }
+
+    public static void verbose(String message) {
+        if (config.debugMode) {
+            log.info(message);
+        }
     }
 }

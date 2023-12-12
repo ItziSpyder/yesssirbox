@@ -9,6 +9,7 @@ import java.util.List;
 public class Config implements JsonSerializable<Config> {
     public String prefix = "&fYessirBox &8» &7";
     public String discordInvite = "https://discord.gg/jmtPkbWjD7";
+    public boolean debugMode = false;
     public List<String> voteLinks = new ArrayList<>();
     public BountyConfig bounties = new BountyConfig();
 
@@ -20,8 +21,8 @@ public class Config implements JsonSerializable<Config> {
     public static class BountyConfig {
         public int minWorth = 1;
         public int maxWorth = 1000000;
-        public boolean allowDuplicates = false;
         public int minTime = 1;
         public int maxTime = 24;
+        public boolean allowDuplicates = false;
     }
 }

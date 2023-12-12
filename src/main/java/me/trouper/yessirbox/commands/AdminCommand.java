@@ -28,6 +28,9 @@ public class AdminCommand implements CustomCommand {
             return;
         }
         switch (args.first().stringValue()) {
+            case "debugmode" -> {
+                YessirBox.config.debugMode = true;
+            }
             case "reload" -> {
                 YessirBox.reloadKonfig();
                 info(p,color(YessirBox.config.prefix + "Reloaded the config."));

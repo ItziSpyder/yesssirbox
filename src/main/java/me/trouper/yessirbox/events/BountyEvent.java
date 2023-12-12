@@ -19,18 +19,18 @@ public class BountyEvent implements CustomListener, Global {
         Player k = v.getKiller();
         YessirBox.log.info("Processing Death Event, Victim: " + v + " Killer: " + k);
         Bounty b = new Bounty(v.getUniqueId(),v.getUniqueId(),0, TimeStamp.now(),0);
-        for (Bounty bounty : YessirBox.bounties.storage) {
+        for (Bounty bounty : YessirBox.bounties.getBounties()) {
             if (!(bounty.target() == v.getUniqueId())) continue;
             b = bounty;
             YessirBox.log.info("Found a valid bounty for the victim \n" + b.getInfo());
             break;
         }
         if (b.amount() == 0) {
-            YessirBox.log.info("No valid bounties found for victim");
+            Yessirox.verbose("No valid bounties found for victim");
             return;
         }
         if (k == null) return;
-        YessirBox.bounties.storage.remove(b);
+        YessirBox.bounties.removeBounty(b);
         EconomyResponse res = YessirBox.econ.depositPlayer(k, b.amount());
         if (res.transactionSuccess()) {
             YessirBox.getInstance().getServer().broadcast(Component.text(color(

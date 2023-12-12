@@ -10,6 +10,7 @@ import me.trouper.yessirbox.data.Bounty;
 import me.trouper.yessirbox.utils.TimeStamp;
 import me.trouper.yessirbox.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -23,27 +24,30 @@ public class BountyCommand implements CustomCommand, Global {
     @Override
     public void dispatchCommand(CommandSender commandSender, Args args) {
         Player p = (Player) commandSender;
+        double duration = args.get(3).doubleValue();
+        double worth = args.get(2).doubleValue();
+        OfflinePlayer target = Bukkit.getOfflinePlayer(args.get(1).stringValue());
         switch (args.first().stringValue()) {
             case "set" -> {
-                if (args.get(2).longValue() < YessirBox.config.bounties.minWorth) {
-                    info(p, color(YessirBox.config.prefix + "&cThe minimum amount for a bounty is " + YessirBox.config.bounties.minWorth + "!"));
+                if (worth < YessirBox.config.bounties.minWorth ) {
+                    info(p, color(YessirBox.config.prefix + "&cYou must provide a value between " + YessirBox.config.bounties.minWorth + " and " + YessirBox.config.bounties.maxWorth + " for the worth!"));
                     return;
                 }
-                if (Math.floor(args.get(3).doubleValue()) != args.get(3).doubleValue() || args.get(3).doubleValue() < YessirBox.config.bounties.minTime) {
-                    info(p, color(YessirBox.config.prefix + "&cYou must provide a whole number for the duration of your bounty!"));
+                if (Math.floor(duration) != duration || duration < YessirBox.config.bounties.minTime || duration > YessirBox.config.bounties.maxTime) {
+                    info(p, color(YessirBox.config.prefix + "&cYou must provide a value between " + YessirBox.config.bounties.minTime + " and " + YessirBox.config.bounties.maxTime + " for the duration of your bounty!"));
                     return;
                 }
-                if (Objects.equals(args.get(1).stringValue(), p.getName())) {
+                if (target == p) {
                     info(p, color(YessirBox.config.prefix + "&cYou cannot set a bounty on yourself!"));
                     return;
                 }
-                if (YessirBox.econ.getBalance(p) <= args.get(2).longValue()) {
+                if (YessirBox.econ.getBalance(p) <= worth) {
                     info(p, color(YessirBox.config.prefix + "&cYou cannot afford that bounty!"));
                     return;
                 }
                 if (!YessirBox.config.bounties.allowDuplicates) {
-                    for (Bounty bounty : YessirBox.bounties.storage) {
-                        if (bounty.target() == Bukkit.getOfflinePlayer(args.get(1).stringValue()).getUniqueId()) {
+                    for (Bounty bounty : YessirBox.bounties.getBounties()) {
+                        if (bounty.target() == target.getUniqueId()) {
                             info(p,color(YessirBox.config.prefix + "&cDuplicating bounties is not allowed! " + Bukkit.getOfflinePlayer(bounty.setter()).getName() + " has already set a bounty on " + Bukkit.getOfflinePlayer(bounty.target()).getName()));
                             return;
                         }
@@ -51,20 +55,20 @@ public class BountyCommand implements CustomCommand, Global {
                 }
                 TimeStamp now = TimeStamp.now();
                 Bounty b = new Bounty(p.getUniqueId(),
-                        Bukkit.getOfflinePlayer(args.get(1).stringValue()).getUniqueId(),
+                        target.getUniqueId(),
                         args.get(2).intValue(),
                         now,
                         args.get(3).longValue());
                 YessirBox.econ.withdrawPlayer(p,b.amount());
-                YessirBox.bounties.storage.add(b);
-                info(p,color(YessirBox.config.prefix + "Set a bounty on &e" + Bukkit.getOfflinePlayer(b.target()).getName() + "&7 worth &2$" + b.amount() + "&7, it will expire in &a" + b.duration() + " &7hours."));
+                YessirBox.bounties.addBounty(b);
                 YessirBox.bounties.save();
+                info(p,color(YessirBox.config.prefix + "Set a bounty on &e" + Bukkit.getOfflinePlayer(b.target()).getName() + "&7 worth &2$" + b.amount() + "&7, it will expire in &a" + b.duration() + " &7hours."));
             }
             case "cancel" -> {
-                for (Bounty bounty : YessirBox.bounties.storage) {
-                    if (bounty.target() == Bukkit.getOfflinePlayer(args.get(1).stringValue()).getUniqueId()) {
+                for (Bounty bounty : YessirBox.bounties.getBounties()) {
+                    if (bounty.target() == target.getUniqueId()) {
                         if (bounty.setter() == p.getUniqueId()) {
-                            YessirBox.bounties.storage.remove(bounty);
+                            YessirBox.bounties.removeBounty(bounty);
                             info(p,color(YessirBox.config.prefix + "Removed your bounty from &e" + args.get(1).stringValue()));
                         } else {
                             info(p,color(YessirBox.config.prefix + "You do not own the bounty on &e" + args.get(1).stringValue()));
@@ -77,7 +81,7 @@ public class BountyCommand implements CustomCommand, Global {
             }
             case "check" -> {
                 Bounty info = new Bounty(p.getUniqueId(),p.getUniqueId(),0,TimeStamp.now(),0);
-                for (Bounty bounty : YessirBox.bounties.storage) {
+                for (Bounty bounty : YessirBox.bounties.getBounties()) {
                     if (!(bounty.target() == Bukkit.getOfflinePlayer(args.get(1).stringValue()).getUniqueId())) continue;
                     info = bounty;
                     break;
@@ -108,31 +112,6 @@ public class BountyCommand implements CustomCommand, Global {
         b.then(b.arg("cancel")
                 .then(b.arg(Utils.unVanishedPlayers())));
         b.then(b.arg("check")
-                .then(b.arg(activeBountiedNames())));
-    }
-
-    public static List<String> activeBountiedNames() {
-        List<String> out = new ArrayList<>();
-        YessirBox.log.info("Attempting to list active bounties...");
-        for (Bounty bounty : YessirBox.bounties.storage) {
-            YessirBox.log.info("Looping through bounty, " + bounty.target());
-            if (isExpired(bounty)) {
-                YessirBox.log.info("A bounty on " + bounty.target() + " has been found to be expired. Removing.");
-                YessirBox.bounties.storage.remove(bounty);
-            } else {
-                out.add(Bukkit.getOfflinePlayer(bounty.target()).getName());
-                YessirBox.log.info("A bounty on " + bounty.target() + " has been found and added.");
-            }
-        }
-        YessirBox.log.info("No bounties has been found.");
-        if (out.isEmpty()) out.add("No Bounties Found");
-        return out;
-    }
-
-    public static boolean isExpired(Bounty b) {
-        long lasted = b.created().secondsBetween(TimeStamp.now());
-        long max = b.duration() * 3600;
-        YessirBox.log.info("Checking bounty validity: " + b.target() + " It has been around for " + lasted + " seconds, its max time is " + max + " seconds.");
-        return lasted >= max;
+                .then(b.arg(YessirBox.bounties.getActiveBountyNames())));
     }
 }
