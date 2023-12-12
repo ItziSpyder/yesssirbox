@@ -3,7 +3,6 @@ package me.trouper.yessirbox.events;
 import io.github.itzispyder.pdk.Global;
 import io.github.itzispyder.pdk.events.CustomListener;
 import me.trouper.yessirbox.YessirBox;
-import me.trouper.yessirbox.commands.BountyCommand;
 import me.trouper.yessirbox.data.Bounty;
 import me.trouper.yessirbox.utils.TimeStamp;
 import net.kyori.adventure.text.Component;
@@ -11,7 +10,6 @@ import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class BountyEvent implements CustomListener, Global {

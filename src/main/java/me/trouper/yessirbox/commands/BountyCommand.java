@@ -7,7 +7,6 @@ import io.github.itzispyder.pdk.commands.CustomCommand;
 import io.github.itzispyder.pdk.commands.completions.CompletionBuilder;
 import me.trouper.yessirbox.YessirBox;
 import me.trouper.yessirbox.data.Bounty;
-import me.trouper.yessirbox.data.BountyStorage;
 import me.trouper.yessirbox.utils.TimeStamp;
 import me.trouper.yessirbox.utils.Utils;
 import org.bukkit.Bukkit;
@@ -45,7 +44,7 @@ public class BountyCommand implements CustomCommand, Global {
                 if (!YessirBox.config.bounties.allowDuplicates) {
                     for (Bounty bounty : YessirBox.bounties.storage) {
                         if (bounty.target() == Bukkit.getOfflinePlayer(args.get(1).stringValue()).getUniqueId()) {
-                            info(p,color(YessirBox.config.prefix + "&cDuplicating YessirBox.bounties.storage is not allowed! " + Bukkit.getOfflinePlayer(bounty.setter()).getName() + " has already set a bounty on " + Bukkit.getOfflinePlayer(bounty.target()).getName()));
+                            info(p,color(YessirBox.config.prefix + "&cDuplicating bounties is not allowed! " + Bukkit.getOfflinePlayer(bounty.setter()).getName() + " has already set a bounty on " + Bukkit.getOfflinePlayer(bounty.target()).getName()));
                             return;
                         }
                     }
@@ -84,7 +83,7 @@ public class BountyCommand implements CustomCommand, Global {
                     break;
                 }
                 if (info.amount() == 0) {
-                    info(p,color(YessirBox.config.prefix + "No bounty exists on &e" + args.get(1)));
+                    info(p,color(YessirBox.config.prefix + "No bounty exists on &e" + args.get(1).stringValue()));
                     return;
                 }
                 long lasted = info.created().secondsBetween(TimeStamp.now());

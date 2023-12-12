@@ -36,7 +36,7 @@ public final class YessirBox extends JavaPlugin {
     public void init() {
         PDK.init(this);
         instance = this;
-        config.save();
+        reloadKonfig();
         initEvents();
         initEconomy();
         initCommands();
@@ -44,6 +44,9 @@ public final class YessirBox extends JavaPlugin {
 
     public static void reloadKonfig() {
         config = JsonSerializable.load("plugins/YessirBox/config.json", Config.class, new Config());
+        bounties = JsonSerializable.load("plugins/YessirBox/bounties.json", BountyStorage.class, new BountyStorage());
+        config.save();
+        bounties.save();
     }
 
     public void initEvents() {

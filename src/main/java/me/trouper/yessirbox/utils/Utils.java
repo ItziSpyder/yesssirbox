@@ -4,7 +4,6 @@ import de.myzelyam.api.vanish.VanishAPI;
 import io.github.itzispyder.pdk.utils.ServerUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.MetadataValue;
 
 public class Utils {
 
