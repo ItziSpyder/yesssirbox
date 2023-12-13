@@ -14,10 +14,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 @CommandRegistry(value="bounty",usage="/bounty <set|cancel|check> <player> [<amount>] [<duration (hours)>]", printStackTrace = true, playersOnly = true)
 public class BountyCommand implements CustomCommand, Global {
 
@@ -28,6 +24,23 @@ public class BountyCommand implements CustomCommand, Global {
         double worth = args.get(2).doubleValue();
         OfflinePlayer target = Bukkit.getOfflinePlayer(args.get(1).stringValue());
         switch (args.first().stringValue()) {
+            case "list" -> {
+                if (YessirBox.bounties.getActiveBounties().isPresent()) {
+                    info(p,color("\n" + YessirBox.config.prefix + "There are &a" + YessirBox.bounties.getBounties().size() + "&7 bounties. &8(&a✔ &7= target online&8)"));
+                    for (Bounty b : YessirBox.bounties.getActiveBounties().get()) {
+                        long lasted = b.created().secondsBetween(TimeStamp.now());
+                        long max = b.duration() * 3600;
+                        double expires = (Math.floor((double) (max - lasted) / 60));
+                        OfflinePlayer t = Bukkit.getOfflinePlayer(b.target());
+                        OfflinePlayer s = Bukkit.getOfflinePlayer(b.setter());
+                        boolean tOn = t.isConnected();
+                        info(p,"&8&m|----------------------------------------------|");
+                        info(p, color((tOn ? "&b - &a✔ " : "&b - &c✘ ") + "&7Target: &c" + t.getName() + "&7 Setter: &b" + s.getName() + "&7 Worth: &2$" + b.amount() + "\n&7 Expires: &6" + expires + "&7 minutes."));
+                    }
+                    return;
+                }
+                info(p,color(YessirBox.config.prefix+ "There are currently no bounties. Set one on a player with /bounty set"));
+            }
             case "set" -> {
                 if (worth < YessirBox.config.bounties.minWorth ) {
                     info(p, color(YessirBox.config.prefix + "&cYou must provide a value between " + YessirBox.config.bounties.minWorth + " and " + YessirBox.config.bounties.maxWorth + " for the worth!"));
@@ -45,13 +58,10 @@ public class BountyCommand implements CustomCommand, Global {
                     info(p, color(YessirBox.config.prefix + "&cYou cannot afford that bounty!"));
                     return;
                 }
-                if (!YessirBox.config.bounties.allowDuplicates) {
-                    for (Bounty bounty : YessirBox.bounties.getBounties()) {
-                        if (bounty.target() == target.getUniqueId()) {
-                            info(p,color(YessirBox.config.prefix + "&cDuplicating bounties is not allowed! " + Bukkit.getOfflinePlayer(bounty.setter()).getName() + " has already set a bounty on " + Bukkit.getOfflinePlayer(bounty.target()).getName()));
-                            return;
-                        }
-                    }
+                if (!YessirBox.config.bounties.allowDuplicates && YessirBox.bounties.bountyExists(target.getUniqueId())) {
+                    var exists = YessirBox.bounties.findBounty(target.getUniqueId());
+                    info(p,color(YessirBox.config.prefix + "&cDuplicating bounties is not allowed! " + Bukkit.getOfflinePlayer(exists.get().setter()).getName() + " has already set a bounty on " + target.getName()));
+                    return;
                 }
                 TimeStamp now = TimeStamp.now();
                 Bounty b = new Bounty(p.getUniqueId(),
@@ -65,41 +75,32 @@ public class BountyCommand implements CustomCommand, Global {
                 info(p,color(YessirBox.config.prefix + "Set a bounty on &e" + Bukkit.getOfflinePlayer(b.target()).getName() + "&7 worth &2$" + b.amount() + "&7, it will expire in &a" + b.duration() + " &7hours."));
             }
             case "cancel" -> {
-                for (Bounty bounty : YessirBox.bounties.getBounties()) {
-                    if (bounty.target() == target.getUniqueId()) {
-                        if (bounty.setter() == p.getUniqueId()) {
-                            YessirBox.bounties.removeBounty(bounty);
-                            info(p,color(YessirBox.config.prefix + "Removed your bounty from &e" + args.get(1).stringValue()));
-                        } else {
-                            info(p,color(YessirBox.config.prefix + "You do not own the bounty on &e" + args.get(1).stringValue()));
-                        }
-                        return;
-                    }
-                }
-                info(p,color(YessirBox.config.prefix + "Could not find a bounty on &e" + args.get(1).stringValue()));
-                YessirBox.bounties.save();
-            }
-            case "check" -> {
-                Bounty info = new Bounty(p.getUniqueId(),p.getUniqueId(),0,TimeStamp.now(),0);
-                for (Bounty bounty : YessirBox.bounties.getBounties()) {
-                    if (!(bounty.target() == Bukkit.getOfflinePlayer(args.get(1).stringValue()).getUniqueId())) continue;
-                    info = bounty;
-                    break;
-                }
-                if (info.amount() == 0) {
-                    info(p,color(YessirBox.config.prefix + "No bounty exists on &e" + args.get(1).stringValue()));
+                var b = YessirBox.bounties.findBounty(target.getUniqueId());
+                if (b.isPresent() && b.get().setter().equals(p.getUniqueId()) ) {
+                    YessirBox.bounties.removeBounty(b.get());
+                    info(p,color(YessirBox.config.prefix + "Removed your bounty from &e" + args.get(1).stringValue()));
+                    return;
+                } else if (!b.isPresent()) {
+                    info(p,color(YessirBox.config.prefix + "Could not find a bounty on &e" + args.get(1).stringValue()));
+                    YessirBox.bounties.save();
                     return;
                 }
-                long lasted = info.created().secondsBetween(TimeStamp.now());
-                long max = info.duration() * 3600;
-                info(p,color(YessirBox.config.prefix + "Found a bounty on &e" + Bukkit.getOfflinePlayer(args.get(1).stringValue()).getName() +
-                        "&7 worth &2$" + info.amount() +
-                        "&7, it expires in &c" + (Math.floor((double) (max - lasted) / 60) ) + "&7 minutes."));
-                YessirBox.bounties.save();
+                info(p,color(YessirBox.config.prefix + "You do not own the bounty on &e" + args.get(1).stringValue()));
             }
-            default -> {
-                info(p, color(YessirBox.config.prefix + "&cIncorrect usage! /bounty <set|cancel|check> <player> [<amount>] [<duration (hours)>]"));
+            case "check" -> {
+                var b = YessirBox.bounties.findBounty(target.getUniqueId());
+                if (b.isPresent()) {
+                    long lasted = b.get().created().secondsBetween(TimeStamp.now());
+                    long max = b.get().duration() * 3600;
+                    double expires = (Math.floor((double) (max - lasted) / 60));
+                    info(p, color(YessirBox.config.prefix + "Found a bounty on &e" + Bukkit.getOfflinePlayer(args.get(1).stringValue()).getName() +
+                            "&7 worth &2$" + b.get().amount() +
+                            "&7, it expires in &c" + expires + "&7 minutes."));
+                    YessirBox.bounties.save();
+                }
+                info(p, color(YessirBox.config.prefix + "No bounty exists on &e" + args.get(1).stringValue()));
             }
+            default -> info(p, color(YessirBox.config.prefix + "&cIncorrect usage! /bounty <set|cancel|check> <player> [<amount>] [<duration (hours)>]"));
         }
     }
 
@@ -113,5 +114,6 @@ public class BountyCommand implements CustomCommand, Global {
                 .then(b.arg(Utils.unVanishedPlayers())));
         b.then(b.arg("check")
                 .then(b.arg(YessirBox.bounties.getActiveBountyNames())));
+        b.then(b.arg("list"));
     }
 }

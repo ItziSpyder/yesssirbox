@@ -13,6 +13,11 @@ public class CompressionRegistry implements JsonSerializable<CompressionRegistry
 
     private final List<CompressInstruction> instructions;
 
+    @Override
+    public File getFile() {
+        return new File("plugins/YessirBox/compressions.json");
+    }
+
     public CompressionRegistry() {
         this.instructions = new ArrayList<>();
     }
@@ -28,11 +33,6 @@ public class CompressionRegistry implements JsonSerializable<CompressionRegistry
             }
         }
         return Pair.of(false,null);
-    }
-
-    @Override
-    public File getFile() {
-        return new File("plugins/YessirBox/compressions.json");
     }
 
     public void removeInstructions(CompressInstruction instruction) {

@@ -1,6 +1,8 @@
 package me.trouper.yessirbox.data;
 
+import io.github.itzispyder.pdk.Global;
 import io.github.itzispyder.pdk.utils.misc.JsonSerializable;
+import io.github.itzispyder.pdk.utils.misc.Voidable;
 import me.trouper.yessirbox.YessirBox;
 import me.trouper.yessirbox.utils.TimeStamp;
 import org.bukkit.Bukkit;
@@ -8,8 +10,9 @@ import org.bukkit.Bukkit;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-public class BountyStorage implements JsonSerializable<BountyStorage> {
+public class BountyStorage implements JsonSerializable<BountyStorage>, Global {
 
     private final List<Bounty> storage;
 
@@ -34,9 +37,37 @@ public class BountyStorage implements JsonSerializable<BountyStorage> {
         return storage;
     }
 
+    public boolean bountyExists(UUID target) {
+        return findBounty(target).isPresent();
+    }
+
+    public Voidable<Bounty> findBounty(UUID target) {
+        Bounty get = null;
+        for (Bounty bounty : YessirBox.bounties.getBounties()) {
+            if (bounty.target().equals(target)) {
+                get = bounty;
+                break;
+            }
+        }
+        return Voidable.of(get);
+    }
+    public Voidable<List<Bounty>> getActiveBounties() {
+        YessirBox.verbose("Attempting to get active bounties...");
+        List<Bounty> l = new ArrayList<>();
+        for (Bounty b : storage) {
+            if (isExpired(b)) {
+                YessirBox.verbose("A bounty on " + b.target() + " has been found to be expired. Removing.");
+                storage.remove(b);
+                continue;
+            }
+            l.add(b);
+        }
+        if (l.isEmpty()) l = null;
+        return Voidable.of(l);
+    }
     public List<String> getActiveBountyNames() {
         List<String> out = new ArrayList<>();
-        YessirBox.log.info("Attempting to list active bounties...");
+        YessirBox.verbose("Attempting to list active bounty names...");
         for (Bounty bounty : storage) {
             YessirBox.verbose("Looping through bounty, " + bounty.target());
             if (isExpired(bounty)) {

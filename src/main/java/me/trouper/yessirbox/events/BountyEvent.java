@@ -2,12 +2,14 @@ package me.trouper.yessirbox.events;
 
 import io.github.itzispyder.pdk.Global;
 import io.github.itzispyder.pdk.events.CustomListener;
+import io.github.itzispyder.pdk.utils.misc.SoundPlayer;
 import me.trouper.yessirbox.YessirBox;
 import me.trouper.yessirbox.data.Bounty;
 import me.trouper.yessirbox.utils.TimeStamp;
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -26,11 +28,13 @@ public class BountyEvent implements CustomListener, Global {
             break;
         }
         if (b.amount() == 0) {
-            Yessirox.verbose("No valid bounties found for victim");
+            YessirBox.verbose("No valid bounties found for victim");
             return;
         }
         if (k == null) return;
         YessirBox.bounties.removeBounty(b);
+        SoundPlayer s = new SoundPlayer(k.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,  10,1);
+        s.play(k);
         EconomyResponse res = YessirBox.econ.depositPlayer(k, b.amount());
         if (res.transactionSuccess()) {
             YessirBox.getInstance().getServer().broadcast(Component.text(color(
