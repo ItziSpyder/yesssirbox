@@ -27,7 +27,7 @@ public class AdminCommand implements CustomCommand {
         if (!(sender instanceof Player p)) {
             return;
         }
-        switch (args.first().stringValue()) {
+        switch (args.first().toString()) {
             case "debugmode" -> {
                 YessirBox.config.debugMode = true;
             }
@@ -39,7 +39,7 @@ public class AdminCommand implements CustomCommand {
                 ItemStack main = p.getInventory().getItemInMainHand();
                 ItemStack off = p.getInventory().getItemInOffHand();
                 if (!main.getType().isAir() && !off.getType().isAir()) {
-                    switch (args.get(1).stringValue()) {
+                    switch (args.get(1).toString()) {
                         case "add" -> {
                             YessirBox.compressionRegistry.registerInstructions(new CompressInstruction(main, off));
                             YessirBox.compressionRegistry.save();
@@ -65,7 +65,7 @@ public class AdminCommand implements CustomCommand {
             }
             case "autocompressor" -> {
 
-                switch (args.get(1).stringValue()) {
+                switch (args.get(1).toString()) {
                     case "apply" -> handleApplyAutoCompressor(p);
                     case "fixlore" -> handleFixLore(p);
                 }

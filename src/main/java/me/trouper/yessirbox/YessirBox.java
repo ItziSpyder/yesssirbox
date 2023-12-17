@@ -59,6 +59,8 @@ public final class YessirBox extends JavaPlugin {
         new BountyCommand().register();
         new DiscordCommand().register();
         new VoteCommand().register();
+        new ShowDonationCommand().register();
+        new StoreCommand().register();
     }
     private void initEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {

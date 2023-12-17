@@ -20,10 +20,10 @@ public class BountyCommand implements CustomCommand, Global {
     @Override
     public void dispatchCommand(CommandSender commandSender, Args args) {
         Player p = (Player) commandSender;
-        double duration = args.get(3).doubleValue();
-        double worth = args.get(2).doubleValue();
-        OfflinePlayer target = Bukkit.getOfflinePlayer(args.get(1).stringValue());
-        switch (args.first().stringValue()) {
+        double duration = args.get(3).toDouble();
+        double worth = args.get(2).toDouble();
+        OfflinePlayer target = Bukkit.getOfflinePlayer(args.get(1).toString());
+        switch (args.first().toString()) {
             case "list" -> {
                 if (YessirBox.bounties.getActiveBounties().isPresent()) {
                     info(p,color("\n" + YessirBox.config.prefix + "There are &a" + YessirBox.bounties.getBounties().size() + "&7 bounties. &8(&a✔ &7= target online&8)"));
@@ -66,9 +66,9 @@ public class BountyCommand implements CustomCommand, Global {
                 TimeStamp now = TimeStamp.now();
                 Bounty b = new Bounty(p.getUniqueId(),
                         target.getUniqueId(),
-                        args.get(2).intValue(),
+                        args.get(2).toInt(),
                         now,
-                        args.get(3).longValue());
+                        args.get(3).toLong());
                 YessirBox.econ.withdrawPlayer(p,b.amount());
                 YessirBox.bounties.addBounty(b);
                 YessirBox.bounties.save();
@@ -78,14 +78,14 @@ public class BountyCommand implements CustomCommand, Global {
                 var b = YessirBox.bounties.findBounty(target.getUniqueId());
                 if (b.isPresent() && b.get().setter().equals(p.getUniqueId()) ) {
                     YessirBox.bounties.removeBounty(b.get());
-                    info(p,color(YessirBox.config.prefix + "Removed your bounty from &e" + args.get(1).stringValue()));
+                    info(p,color(YessirBox.config.prefix + "Removed your bounty from &e" + args.get(1).toString()));
                     return;
                 } else if (!b.isPresent()) {
-                    info(p,color(YessirBox.config.prefix + "Could not find a bounty on &e" + args.get(1).stringValue()));
+                    info(p,color(YessirBox.config.prefix + "Could not find a bounty on &e" + args.get(1).toString()));
                     YessirBox.bounties.save();
                     return;
                 }
-                info(p,color(YessirBox.config.prefix + "You do not own the bounty on &e" + args.get(1).stringValue()));
+                info(p,color(YessirBox.config.prefix + "You do not own the bounty on &e" + args.get(1).toString()));
             }
             case "check" -> {
                 var b = YessirBox.bounties.findBounty(target.getUniqueId());
@@ -93,12 +93,12 @@ public class BountyCommand implements CustomCommand, Global {
                     long lasted = b.get().created().secondsBetween(TimeStamp.now());
                     long max = b.get().duration() * 3600;
                     double expires = (Math.floor((double) (max - lasted) / 60));
-                    info(p, color(YessirBox.config.prefix + "Found a bounty on &e" + Bukkit.getOfflinePlayer(args.get(1).stringValue()).getName() +
+                    info(p, color(YessirBox.config.prefix + "Found a bounty on &e" + Bukkit.getOfflinePlayer(args.get(1).toString()).getName() +
                             "&7 worth &2$" + b.get().amount() +
                             "&7, it expires in &c" + expires + "&7 minutes."));
                     YessirBox.bounties.save();
                 }
-                info(p, color(YessirBox.config.prefix + "No bounty exists on &e" + args.get(1).stringValue()));
+                info(p, color(YessirBox.config.prefix + "No bounty exists on &e" + args.get(1).toString()));
             }
             default -> info(p, color(YessirBox.config.prefix + "&cIncorrect usage! /bounty <set|cancel|check> <player> [<amount>] [<duration (hours)>]"));
         }
