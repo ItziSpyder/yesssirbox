@@ -6,9 +6,7 @@ import me.trouper.yessirbox.commands.*;
 import me.trouper.yessirbox.data.BanStorage;
 import me.trouper.yessirbox.data.BountyStorage;
 import me.trouper.yessirbox.data.Config;
-import me.trouper.yessirbox.events.AutoCompressorEvent;
-import me.trouper.yessirbox.events.BountyEvent;
-import me.trouper.yessirbox.events.EntityDamageListener;
+import me.trouper.yessirbox.events.*;
 import me.trouper.yessirbox.system.CompressionRegistry;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -55,6 +53,8 @@ public final class YessirBox extends JavaPlugin {
         new BountyEvent().register();
         new AutoCompressorEvent().register();
         new EntityDamageListener().register();
+        new BossBarSyncEvent().register();
+        new BossStagesEvent().register();
     }
 
     public void initCommands() {
@@ -68,6 +68,7 @@ public final class YessirBox extends JavaPlugin {
         new StoreCommand().register();
         new AttackCooldownCommand().register();
         new VulcanBanCommand().register();
+        new BossCommand().register();
     }
     private void initEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {

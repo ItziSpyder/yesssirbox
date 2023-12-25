@@ -29,6 +29,8 @@ commands:
     usage: /attackcooldown
   vulcanban:
     usage: /vulcanban <player>
+  boss:
+    usage: /boss <spawn>
 permissions:
   yessirbox.admin:
     description: Allows full access to the /ysb admin command

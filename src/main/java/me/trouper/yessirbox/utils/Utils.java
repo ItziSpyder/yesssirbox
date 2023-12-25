@@ -2,6 +2,7 @@ package me.trouper.yessirbox.utils;
 
 import de.myzelyam.api.vanish.VanishAPI;
 import io.github.itzispyder.pdk.utils.ServerUtils;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -29,5 +30,17 @@ public class Utils {
     }
     public static boolean isVanished(Player player) {
         return !VanishAPI.isInvisible(player);
+    }
+
+    @SuppressWarnings("deprecation")
+    public static float getHealth(Damageable e) {
+        return (float) ((e.getHealth() + e.getAbsorptionAmount()) / e.getMaxHealth());
+    }
+    public static void sleep(int milis) {
+        try {
+            Thread.sleep(milis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
