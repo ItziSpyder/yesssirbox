@@ -19,7 +19,7 @@ public class AutoCompressorEvent implements CustomListener, Global {
     @EventHandler
     private void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        if (map.get(p.getUniqueId()) && p.hasPermission("yessirbox.toggleautocompress") && !map.containsKey(p.getUniqueId())) {
+        if (p.hasPermission("yessirbox.toggleautocompress") && !map.containsKey(p.getUniqueId())) {
             p.sendMessage(color(YessirBox.config.prefix + "&cYou have not initialized the AutoCompressor yet! &7Toggle it with /autocompressor"));
             map.put(p.getUniqueId(),false);
         }
@@ -27,11 +27,11 @@ public class AutoCompressorEvent implements CustomListener, Global {
     @EventHandler
     private void onBreak(BlockBreakEvent event) {
         Player p = event.getPlayer();
-        if (p.getInventory().getItemInMainHand() == null || p.getInventory().getItemInMainHand().getType().isAir()) return;
-        ItemStack i = p.getInventory().getItemInMainHand();
-        if (!i.getItemMeta().hasCustomModelData() || i.getItemMeta().getCustomModelData() != 1111) return;
-        if (!map.containsKey(p.getUniqueId()) && p.hasPermission("yessirbox.toggleautocompress")) {
-            p.sendMessage(color(YessirBox.config.prefix + "&cYou have not initialized the AutoCompressor yet! &7Toggle it with /autocompressor"));
+        if (p.getInventory().getItemInMainHand().getType().isAir()) return;
+
+        //if (!i.getItemMeta().hasCustomModelData() || i.getItemMeta().getCustomModelData() != 1111) return;
+        if (!map.containsKey(p.getUniqueId())) {
+            map.put(p.getUniqueId(),false);
             return;
         }
         if (map.get(p.getUniqueId()) && p.hasPermission("yessirbox.toggleautocompress")) {

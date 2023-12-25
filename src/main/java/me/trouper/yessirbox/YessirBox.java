@@ -3,16 +3,19 @@ package me.trouper.yessirbox;
 import io.github.itzispyder.pdk.PDK;
 import io.github.itzispyder.pdk.utils.misc.JsonSerializable;
 import me.trouper.yessirbox.commands.*;
+import me.trouper.yessirbox.data.BanStorage;
 import me.trouper.yessirbox.data.BountyStorage;
 import me.trouper.yessirbox.data.Config;
 import me.trouper.yessirbox.events.AutoCompressorEvent;
 import me.trouper.yessirbox.events.BountyEvent;
+import me.trouper.yessirbox.events.EntityDamageListener;
 import me.trouper.yessirbox.system.CompressionRegistry;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.logging.Logger;
 
 public final class YessirBox extends JavaPlugin {
@@ -20,6 +23,7 @@ public final class YessirBox extends JavaPlugin {
     private static YessirBox instance;
     public static final Logger log = Bukkit.getLogger();
     public static final BountyStorage bounties = JsonSerializable.load("plugins/YessirBox/bounties.json", BountyStorage.class, new BountyStorage());
+    public static final BanStorage banStorage = JsonSerializable.load("plugins/YessirBox/banstorage.json", BanStorage.class, new BanStorage());
     public static final CompressionRegistry compressionRegistry = JsonSerializable.load("plugins/YessirBox/compressions.json", CompressionRegistry.class, new CompressionRegistry());
     public static Economy econ;
 
@@ -50,6 +54,7 @@ public final class YessirBox extends JavaPlugin {
     public void initEvents() {
         new BountyEvent().register();
         new AutoCompressorEvent().register();
+        new EntityDamageListener().register();
     }
 
     public void initCommands() {
@@ -61,6 +66,8 @@ public final class YessirBox extends JavaPlugin {
         new VoteCommand().register();
         new ShowDonationCommand().register();
         new StoreCommand().register();
+        new AttackCooldownCommand().register();
+        new VulcanBanCommand().register();
     }
     private void initEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {

@@ -25,6 +25,10 @@ commands:
     permission: yessirbox.showdonation
   store:
     usage: /store
+  attackcooldown:
+    usage: /attackcooldown
+  vulcanban:
+    usage: /vulcanban <player>
 permissions:
   yessirbox.admin:
     description: Allows full access to the /ysb admin command
@@ -34,3 +38,5 @@ permissions:
     description: Allows access to the autoCompression enchant, and toggle command
   yessirbox.showdonation:
     description: Allows showing donator heads in chat
+  yessirbox.attackcooldown:
+    description: secret thingy
