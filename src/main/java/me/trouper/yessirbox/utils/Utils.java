@@ -2,7 +2,11 @@ package me.trouper.yessirbox.utils;
 
 import de.myzelyam.api.vanish.VanishAPI;
 import io.github.itzispyder.pdk.utils.ServerUtils;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -42,5 +46,22 @@ public class Utils {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Player getNearestPlayer(Location loc) {
+
+        double closestDistanceSquared = Double.MAX_VALUE;
+        Player nearestPlayer = null;
+
+        for (Player player : loc.getWorld().getPlayers()) {
+            double distanceSquared = player.getLocation().distanceSquared(loc);
+
+            if (distanceSquared < closestDistanceSquared) {
+                closestDistanceSquared = distanceSquared;
+                nearestPlayer = player;
+            }
+        }
+        //Bukkit.broadcast(Component.text("Found a nearest player (" + nearestPlayer + ")"));
+        return nearestPlayer;
     }
 }

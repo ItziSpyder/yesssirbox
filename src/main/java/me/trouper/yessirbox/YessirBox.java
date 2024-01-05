@@ -2,6 +2,8 @@ package me.trouper.yessirbox;
 
 import io.github.itzispyder.pdk.PDK;
 import io.github.itzispyder.pdk.utils.misc.JsonSerializable;
+import io.github.itzispyder.real.Real;
+import io.github.itzispyder.real.boss.Boss;
 import me.trouper.yessirbox.commands.*;
 import me.trouper.yessirbox.data.BanStorage;
 import me.trouper.yessirbox.data.BountyStorage;
@@ -32,11 +34,13 @@ public final class YessirBox extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        Real.onDisable();
         reloadKonfig();
     }
 
     public void init() {
         PDK.init(this);
+        Real.init();
         instance = this;
         reloadKonfig();
         initEvents();
@@ -53,7 +57,6 @@ public final class YessirBox extends JavaPlugin {
         new BountyEvent().register();
         new AutoCompressorEvent().register();
         new EntityDamageListener().register();
-        new BossBarSyncEvent().register();
         new BossStagesEvent().register();
     }
 
